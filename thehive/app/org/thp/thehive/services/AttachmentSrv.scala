@@ -19,7 +19,7 @@ import java.nio.file.Files
 import scala.concurrent.Future
 import scala.util.Try
 
-class AttachmentSrv(configuration: Configuration, storageSrv: StorageSrv, mat: Materializer) extends VertexSrv[Attachment] with TheHiveOps {
+class AttachmentSrv(configuration: Configuration, storageSrv: StorageSrv, mat: Materializer) extends VertexSrv[Attachment] with TheHiveOpsNoDeps {
   implicit val _mat: Materializer = mat
 
   val hashers: Hasher = Hasher(configuration.get[Seq[String]]("attachment.hash"): _*)
@@ -88,7 +88,7 @@ class AttachmentSrv(configuration: Configuration, storageSrv: StorageSrv, mat: M
 
 }
 
-trait AttachmentOps { _: TheHiveOps =>
+trait AttachmentOps { _: TheHiveOpsNoDeps =>
   implicit class AttachmentOpsDefs(traversal: Traversal.V[Attachment]) {
     def getByAttachmentId(attachmentId: String): Traversal.V[Attachment] = traversal.has(_.attachmentId, attachmentId)
 

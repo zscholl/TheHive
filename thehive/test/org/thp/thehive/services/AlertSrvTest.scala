@@ -10,7 +10,7 @@ import play.api.test.PlaySpecification
 
 import java.util.Date
 
-class AlertSrvTest extends PlaySpecification with TestAppBuilder with TheHiveOps {
+class AlertSrvTest extends PlaySpecification with TestAppBuilder with TheHiveOpsNoDeps {
   implicit val authContext: AuthContext = DummyUserSrv(userId = "certuser@thehive.local", organisation = "cert").authContext
 
   "alert service" should {

@@ -13,7 +13,7 @@ import play.api.libs.json.{JsObject, Json}
 import java.util.{List => JList, Map => JMap}
 import scala.util.{Success, Try}
 
-class DashboardSrv(organisationSrv: OrganisationSrv, userSrv: UserSrv, auditSrv: AuditSrv) extends VertexSrv[Dashboard] with TheHiveOps {
+class DashboardSrv(organisationSrv: OrganisationSrv, userSrv: UserSrv, auditSrv: AuditSrv) extends VertexSrv[Dashboard] with TheHiveOpsNoDeps {
   val organisationDashboardSrv = new EdgeSrv[OrganisationDashboard, Organisation, Dashboard]
   val dashboardUserSrv         = new EdgeSrv[DashboardUser, Dashboard, User]
 
@@ -74,7 +74,7 @@ class DashboardSrv(organisationSrv: OrganisationSrv, userSrv: UserSrv, auditSrv:
     }
 }
 
-trait DashboardOps { _: TheHiveOps =>
+trait DashboardOps { _: TheHiveOpsNoDeps =>
 
   implicit class DashboardOpsDefs(traversal: Traversal.V[Dashboard]) {
 

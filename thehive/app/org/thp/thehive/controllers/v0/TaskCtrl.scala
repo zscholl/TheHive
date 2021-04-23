@@ -17,7 +17,7 @@ class TaskCtrl(
     override val db: Database,
     taskSrv: TaskSrv,
     caseSrv: CaseSrv,
-    organisationSrv: OrganisationSrv,
+    val organisationSrv: OrganisationSrv,
     override val queryExecutor: QueryExecutor,
     override val publicData: PublicTask
 ) extends QueryCtrl
@@ -39,7 +39,7 @@ class TaskCtrl(
       .authRoTransaction(db) { implicit request => implicit graph =>
         taskSrv
           .get(EntityIdOrName(taskId))
-          .visible(organisationSrv)
+          .visible
           .richTask
           .getOrFail("Task")
           .map { task =>
@@ -73,7 +73,7 @@ class TaskCtrl(
       (graph, authContext) =>
         caseSrv
           .get(EntityIdOrName(caseId))(graph)
-          .visible(organisationSrv)(authContext)
+          .visible(authContext)
           ._id
           .headOption
           .fold[Traversal.V[Task]](graph.empty)(c => taskSrv.startTraversal(graph).relatedTo(c))
@@ -87,7 +87,7 @@ class TaskCtrl(
   }
 }
 
-class PublicTask(taskSrv: TaskSrv, organisationSrv: OrganisationSrv, userSrv: UserSrv) extends PublicData with TheHiveOps {
+class PublicTask(taskSrv: TaskSrv, organisationSrv: OrganisationSrv, userSrv: UserSrv) extends PublicData with TheHiveOpsNoDeps {
   override val entityName: String = "task"
   override val initialQuery: Query =
     Query.init[Traversal.V[Task]](

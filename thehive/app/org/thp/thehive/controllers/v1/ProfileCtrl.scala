@@ -8,7 +8,7 @@ import org.thp.scalligraph.{AuthorizationError, EntityIdOrName}
 import org.thp.thehive.controllers.v0.Conversion._
 import org.thp.thehive.dto.v0.InputProfile
 import org.thp.thehive.models.{Permissions, Profile}
-import org.thp.thehive.services.{ProfileSrv, TheHiveOps}
+import org.thp.thehive.services.{ProfileSrv, TheHiveOpsNoDeps}
 import play.api.mvc.{Action, AnyContent, Results}
 
 import scala.util.Failure
@@ -19,7 +19,7 @@ class ProfileCtrl(
     profileSrv: ProfileSrv,
     implicit val db: Database
 ) extends QueryableCtrl
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
 
   override val getQuery: ParamQuery[EntityIdOrName] = Query.initWithParam[EntityIdOrName, Traversal.V[Profile]](
     "getProfile",

@@ -24,7 +24,7 @@ class CaseTemplateSrv(
     auditSrv: AuditSrv,
     integrityCheckActor: => ActorRef @@ IntegrityCheckTag
 ) extends VertexSrv[CaseTemplate]
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
 
   val caseTemplateTagSrv          = new EdgeSrv[CaseTemplateTag, CaseTemplate, Tag]
   val caseTemplateCustomFieldSrv  = new EdgeSrv[CaseTemplateCustomField, CaseTemplate, CustomField]
@@ -142,7 +142,7 @@ class CaseTemplateSrv(
     } yield RichCustomField(cf, ccfe)
 }
 
-trait CaseTemplateOps { _: TheHiveOps =>
+trait CaseTemplateOps { _: TheHiveOpsNoDeps =>
   implicit class CaseTemplateOpsDefs(traversal: Traversal.V[CaseTemplate]) {
 
     def get(idOrName: EntityIdOrName): Traversal.V[CaseTemplate] =
@@ -268,7 +268,7 @@ class CaseTemplateIntegrityCheckOps(
     val service: CaseTemplateSrv,
     organisationSrv: OrganisationSrv
 ) extends IntegrityCheckOps[CaseTemplate]
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
   override def findDuplicates: Seq[Seq[CaseTemplate with Entity]] =
     db.roTransaction { implicit graph =>
       organisationSrv

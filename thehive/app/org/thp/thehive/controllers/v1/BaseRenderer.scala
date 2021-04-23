@@ -1,12 +1,12 @@
 package org.thp.thehive.controllers.v1
 
 import org.thp.scalligraph.traversal.{Converter, Traversal}
-import org.thp.thehive.services.TheHiveOps
+import org.thp.thehive.services.TheHiveOpsNoDeps
 import play.api.libs.json.{JsObject, JsValue}
 
 import java.util.{Map => JMap}
 
-trait BaseRenderer[A] extends TheHiveOps {
+trait BaseRenderer[A] extends TheHiveOpsNoDeps {
 
   type JsConverter = Converter[JsObject, JMap[String, Any]]
   type JsTraversal = Traversal[JsObject, JMap[String, Any], JsConverter]

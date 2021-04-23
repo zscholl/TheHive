@@ -25,7 +25,7 @@ class TaskSrv(
     shareSrv: ShareSrv,
     logSrv: LogSrv
 ) extends VertexSrv[Task]
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
 
   val caseTemplateTaskSrv = new EdgeSrv[CaseTemplateTask, CaseTemplate, Task]
   val taskUserSrv         = new EdgeSrv[TaskUser, Task, User]
@@ -135,14 +135,11 @@ class TaskSrv(
   }
 }
 
-trait TaskOps { _: TheHiveOps =>
+trait TaskOpsNoDeps { _: TheHiveOpsNoDeps =>
   implicit class TaskOpsDefs(traversal: Traversal.V[Task]) {
 
     def get(idOrName: EntityIdOrName): Traversal.V[Task] =
       idOrName.fold(traversal.getByIds(_), _ => traversal.empty)
-
-    def visible(organisationSrv: OrganisationSrv)(implicit authContext: AuthContext): Traversal.V[Task] =
-      traversal.has(_.organisationIds, organisationSrv.currentId(traversal.graph, authContext))
 
     def assignTo(login: String): Traversal.V[Task] = traversal.has(_.assignee, login)
 
@@ -228,5 +225,13 @@ trait TaskOps { _: TheHiveOps =>
 
     def share(organisation: EntityIdOrName): Traversal.V[Share] =
       traversal.in[ShareTask].filter(_.in[OrganisationShare].v[Organisation].get(organisation)).v[Share]
+  }
+}
+
+trait TaskOps { _: TheHiveOpsNoDeps =>
+  protected val organisationSrv: OrganisationSrv
+  implicit class TaskOpsNoDepsDefs(traversal: Traversal.V[Task]) {
+    def visible(implicit authContext: AuthContext): Traversal.V[Task] =
+      traversal.has(_.organisationIds, organisationSrv.currentId(traversal.graph, authContext))
   }
 }

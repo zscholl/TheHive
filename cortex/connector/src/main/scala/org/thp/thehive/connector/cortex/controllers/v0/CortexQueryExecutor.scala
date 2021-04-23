@@ -12,7 +12,7 @@ import org.thp.thehive.connector.cortex.models.Job
 import org.thp.thehive.connector.cortex.services.CortexOps
 import org.thp.thehive.controllers.v0._
 import org.thp.thehive.models.Observable
-import org.thp.thehive.services.TheHiveOps
+import org.thp.thehive.services.TheHiveOpsNoDeps
 
 import scala.reflect.runtime.{universe => ru}
 
@@ -59,7 +59,7 @@ class CortexQueryExecutor(
   override val version: (Int, Int) = 0 -> 1
 }
 
-class CortexParentIdInputFilter(parentId: String) extends InputQuery[Traversal.Unk, Traversal.Unk] with CortexOps with TheHiveOps {
+class CortexParentIdInputFilter(parentId: String) extends InputQuery[Traversal.Unk, Traversal.Unk] with CortexOps with TheHiveOpsNoDeps {
   override def apply(
       publicProperties: PublicProperties,
       traversalType: ru.Type,

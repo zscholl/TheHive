@@ -5,7 +5,7 @@ import org.thp.scalligraph.models._
 import org.thp.thehive.models._
 import play.api.test.PlaySpecification
 
-class DataSrvTest extends PlaySpecification with TestAppBuilder with TheHiveOps {
+class DataSrvTest extends PlaySpecification with TestAppBuilder with TheHiveOpsNoDeps {
   implicit val authContext: AuthContext = DummyUserSrv(userId = "certuser@thehive.local", organisation = "cert").authContext
 
   "data service" should {

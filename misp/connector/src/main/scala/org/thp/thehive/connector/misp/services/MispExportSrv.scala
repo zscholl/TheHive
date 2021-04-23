@@ -22,7 +22,7 @@ class MispExportSrv(
     db: Database,
     clientsConfig: ConfigItem[Seq[TheHiveMispClientConfig], Seq[TheHiveMispClient]],
     attributeConvertersConfig: ConfigItem[Seq[AttributeConverter], Seq[AttributeConverter]]
-) extends TheHiveOps {
+) extends TheHiveOpsNoDeps {
 
   lazy val logger: Logger = Logger(getClass)
 

@@ -25,7 +25,7 @@ class AuditSrv(
     eventSrv: EventSrv,
     db: Database
 ) extends VertexSrv[Audit]
-    with TheHiveOps { auditSrv =>
+    with TheHiveOpsNoDeps { auditSrv =>
   lazy val userSrv: UserSrv                                = _userSrv
   lazy val notificationActor: ActorRef @@ NotificationTag  = _notificationActor
   val auditUserSrv                                         = new EdgeSrv[AuditUser, Audit, User]
@@ -303,7 +303,7 @@ class AuditSrv(
   }
 }
 
-trait AuditOps { _: TheHiveOps =>
+trait AuditOpsNoDeps { _: TheHiveOpsNoDeps =>
 
   implicit class VertexDefs(traversal: Traversal[Vertex, Vertex, IdentityConverter[Vertex]]) {
     def share: Traversal.V[Share] = traversal.coalesceIdent(_.in[ShareObservable], _.in[ShareTask], _.in[ShareCase]).v[Share]
@@ -406,23 +406,28 @@ trait AuditOps { _: TheHiveOps =>
         )
         .domainMap(EntityId.apply)
 
-    def visible(organisationSrv: OrganisationSrv)(implicit authContext: AuthContext): Traversal.V[Audit] =
-      traversal.filter(
-        _.out[AuditContext].chooseBranch[String, Any](
-          _.on(_.label)
-            .option("Case", _.v[Case].visible(organisationSrv).widen[Any])
-            .option("Observable", _.v[Observable].visible(organisationSrv).widen[Any])
-            .option("Task", _.v[Task].visible(organisationSrv).widen[Any])
-            .option("Alert", _.v[Alert].visible(organisationSrv).widen[Any])
-            .option("Organisation", _.v[Organisation].current.widen[Any])
-            .option("CaseTemplate", _.v[CaseTemplate].visible.widen[Any])
-            .option("Dashboard", _.v[Dashboard].visible.widen[Any])
-        )
-      )
-
     def `object`: Traversal[Vertex, Vertex, IdentityConverter[Vertex]] = traversal.out[Audited]
 
     def context: Traversal[Vertex, Vertex, IdentityConverter[Vertex]] = traversal.out[AuditContext]
   }
 
+}
+
+trait AuditOps { _: TheHiveOps =>
+  implicit class AuditOpsNoDepsDefs(traversal: Traversal.V[Audit]) {
+
+    def visible(implicit authContext: AuthContext): Traversal.V[Audit] =
+      traversal.filter(
+        _.out[AuditContext].chooseBranch[String, Any](
+          _.on(_.label)
+            .option("Case", _.v[Case].visible.widen[Any])
+            .option("Observable", _.v[Observable].visible.widen[Any])
+            .option("Task", _.v[Task].visible.widen[Any])
+            .option("Alert", _.v[Alert].visible.widen[Any])
+            .option("Organisation", _.v[Organisation].current.widen[Any])
+            .option("CaseTemplate", _.v[CaseTemplate].visible.widen[Any])
+            .option("Dashboard", _.v[Dashboard].visible.widen[Any])
+        )
+      )
+  }
 }

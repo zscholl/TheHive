@@ -8,7 +8,7 @@ import play.api.test.PlaySpecification
 
 import scala.util.{Failure, Success}
 
-class UserSrvTest extends PlaySpecification with TestAppBuilder with TheHiveOps {
+class UserSrvTest extends PlaySpecification with TestAppBuilder with TheHiveOpsNoDeps {
   implicit val authContext: AuthContext = DummyUserSrv(userId = "admin@thehive.local").getSystemAuthContext
 
   "user service" should {

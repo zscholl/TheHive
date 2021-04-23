@@ -11,7 +11,7 @@ import play.api.libs.json.{JsNumber, JsObject, JsString}
 
 import java.util.{Date, List => JList, Map => JMap}
 
-trait AuditRenderer extends TheHiveOps {
+trait AuditRenderer extends TheHiveOpsNoDeps {
 
   def caseToJson: Traversal.V[Case] => Traversal[JsObject, JList[JMap[String, Any]], Converter[JsObject, JList[JMap[String, Any]]]] =
     _.richCaseWithoutPerms.option.domainMap[JsObject](_.fold(JsObject.empty)(_.toJson.as[JsObject]))

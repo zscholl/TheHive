@@ -7,7 +7,7 @@ import org.thp.thehive.models._
 import play.api.libs.json.{JsNumber, JsString, JsTrue, JsValue}
 import play.api.test.PlaySpecification
 
-class CaseTemplateSrvTest extends PlaySpecification with TestAppBuilder with TheHiveOps {
+class CaseTemplateSrvTest extends PlaySpecification with TestAppBuilder with TheHiveOpsNoDeps {
   implicit val authcontext: AuthContext = DummyUserSrv(userId = "certuser@thehive.local", organisation = "cert").authContext
 
   "case template service" should {

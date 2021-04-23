@@ -17,7 +17,7 @@ object LocalPasswordAuthSrv {
     SecureHash.createHash(password)
 }
 
-class LocalPasswordAuthSrv(db: Database, userSrv: UserSrv, localUserSrv: LocalUserSrv) extends AuthSrv with TheHiveOps {
+class LocalPasswordAuthSrv(db: Database, userSrv: UserSrv, localUserSrv: LocalUserSrv) extends AuthSrv with TheHiveOpsNoDeps {
   val name                                             = "local"
   override val capabilities: Set[AuthCapability.Value] = Set(AuthCapability.changePassword, AuthCapability.setPassword)
   lazy val logger: Logger                              = Logger(getClass)

@@ -18,7 +18,7 @@ class LocalKeyAuthSrv(
     requestOrganisation: RequestOrganisation,
     ec: ExecutionContext
 ) extends KeyAuthSrv(authSrv, requestOrganisation, ec)
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
 
   final protected def generateKey(): String = {
     val bytes = Array.ofDim[Byte](24)

@@ -2,11 +2,11 @@ package org.thp.thehive.controllers.v0
 
 import org.thp.scalligraph.EntityName
 import org.thp.thehive.dto.v0.OutputPage
-import org.thp.thehive.services.TheHiveOps
+import org.thp.thehive.services.TheHiveOpsNoDeps
 import play.api.libs.json.Json
 import play.api.test.{FakeRequest, PlaySpecification}
 
-class PageCtrlTest extends PlaySpecification with TestAppBuilder with TheHiveOps {
+class PageCtrlTest extends PlaySpecification with TestAppBuilder with TheHiveOpsNoDeps {
 //  val dummyUserSrv               = DummyUserSrv(userId = "admin@thehive.local", permissions = Permissions.all)
 //    def createPage(title: String, content: String, order: Int, slug: String, cat: String) = {
 //      val request = FakeRequest("POST", "/api/page")

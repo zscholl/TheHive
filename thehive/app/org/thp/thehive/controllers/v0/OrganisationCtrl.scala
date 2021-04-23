@@ -21,7 +21,7 @@ class OrganisationCtrl(
     override val queryExecutor: QueryExecutor,
     override val publicData: PublicOrganisation
 ) extends QueryCtrl
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
 
   def create: Action[AnyContent] =
     entrypoint("create organisation")
@@ -122,7 +122,7 @@ class OrganisationCtrl(
       }
 }
 
-class PublicOrganisation(organisationSrv: OrganisationSrv) extends PublicData with TheHiveOps {
+class PublicOrganisation(organisationSrv: OrganisationSrv) extends PublicData with TheHiveOpsNoDeps {
   override val entityName: String = "organisation"
 
   override val initialQuery: Query =

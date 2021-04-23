@@ -4,7 +4,7 @@ import org.thp.scalligraph.auth.AuthContext
 import org.thp.scalligraph.models.DummyUserSrv
 import play.api.test.PlaySpecification
 
-class TaskSrvTest extends PlaySpecification with TestAppBuilder with TheHiveOps {
+class TaskSrvTest extends PlaySpecification with TestAppBuilder with TheHiveOpsNoDeps {
   "task service" should {
 
     "set actionRequired for an organisation" in testApp { app =>

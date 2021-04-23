@@ -3,7 +3,7 @@ package org.thp.thehive.services
 import org.thp.thehive.models._
 import play.api.test.PlaySpecification
 
-class ImpactStatusSrvTest extends PlaySpecification with TestAppBuilder with TheHiveOps {
+class ImpactStatusSrvTest extends PlaySpecification with TestAppBuilder with TheHiveOpsNoDeps {
   "impact status service" should {
     "get values" in testApp { app =>
       import app._

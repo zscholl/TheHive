@@ -13,7 +13,7 @@ import play.api.Logger
 class ServiceHelper(
     db: Database,
     organisationSrv: OrganisationSrv
-) extends TheHiveOps {
+) extends TheHiveOpsNoDeps {
 
   lazy val logger: Logger = Logger(getClass)
 

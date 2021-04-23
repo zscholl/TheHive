@@ -13,7 +13,7 @@ import org.thp.thehive.models._
 import java.util.{Map => JMap}
 import scala.util.{Failure, Success, Try}
 
-class TaxonomySrv(_organisationSrv: => OrganisationSrv, _tagSrv: => TagSrv) extends VertexSrv[Taxonomy] with TheHiveOps {
+class TaxonomySrv(_organisationSrv: => OrganisationSrv, _tagSrv: => TagSrv) extends VertexSrv[Taxonomy] with TheHiveOpsNoDeps {
   lazy val organisationSrv: OrganisationSrv = _organisationSrv
   lazy val tagSrv: TagSrv                   = _tagSrv
   val taxonomyTagSrv                        = new EdgeSrv[TaxonomyTag, Taxonomy, Tag]
@@ -92,7 +92,7 @@ class TaxonomySrv(_organisationSrv: => OrganisationSrv, _tagSrv: => TagSrv) exte
 
 }
 
-trait TaxonomyOps { _: TheHiveOps =>
+trait TaxonomyOps { _: TheHiveOpsNoDeps =>
   implicit class TaxonomyOpsDefs(traversal: Traversal.V[Taxonomy]) {
 
     def get(idOrName: EntityId): Traversal.V[Taxonomy] =

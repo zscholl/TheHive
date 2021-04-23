@@ -2,11 +2,11 @@ package org.thp.thehive.controllers.v0
 
 import org.thp.thehive.dto.v0.OutputCustomField
 import org.thp.thehive.models._
-import org.thp.thehive.services.TheHiveOps
+import org.thp.thehive.services.TheHiveOpsNoDeps
 import play.api.libs.json.{JsNumber, JsString, Json}
 import play.api.test.{FakeRequest, PlaySpecification}
 
-class CustomFieldCtrlTest extends PlaySpecification with TestAppBuilder with TheHiveOps {
+class CustomFieldCtrlTest extends PlaySpecification with TestAppBuilder with TheHiveOpsNoDeps {
   "custom field controller" should {
     "create a string custom field with options" in testApp { app =>
       import app.thehiveModuleV0._

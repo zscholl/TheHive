@@ -12,7 +12,7 @@ import org.thp.thehive.connector.cortex.services.{AnalyzerTemplateSrv, CortexOps
 import org.thp.thehive.controllers.v0.Conversion._
 import org.thp.thehive.controllers.v0.{OutputParam, PublicData, QueryCtrl}
 import org.thp.thehive.models.Permissions
-import org.thp.thehive.services.TheHiveOps
+import org.thp.thehive.services.TheHiveOpsNoDeps
 import play.api.libs.json.{JsFalse, JsObject, JsTrue}
 import play.api.mvc.{Action, AnyContent, Results}
 
@@ -27,7 +27,7 @@ class AnalyzerTemplateCtrl(
     override val publicData: PublicAnalyzerTemplate
 ) extends QueryCtrl
     with CortexOps
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
 
   def get(id: String): Action[AnyContent] =
     entrypoint("get content")

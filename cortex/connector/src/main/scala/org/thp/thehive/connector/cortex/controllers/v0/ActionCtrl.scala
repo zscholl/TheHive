@@ -9,7 +9,7 @@ import org.thp.scalligraph.traversal.{IteratorOutput, Traversal}
 import org.thp.thehive.connector.cortex.controllers.v0.Conversion._
 import org.thp.thehive.connector.cortex.dto.v0.InputAction
 import org.thp.thehive.connector.cortex.models.{Action, ActionContext, RichAction}
-import org.thp.thehive.connector.cortex.services.{ActionSrv, CortexOps, EntityHelper}
+import org.thp.thehive.connector.cortex.services.{ActionOps, ActionSrv, CortexOps, EntityHelper}
 import org.thp.thehive.controllers.v0.Conversion.{toObjectType, _}
 import org.thp.thehive.controllers.v0._
 import org.thp.thehive.models._
@@ -71,14 +71,14 @@ class ActionCtrl(
       }
 }
 
-class PublicAction(actionSrv: ActionSrv, organisationSrv: OrganisationSrv, db: Database) extends PublicData with TheHiveOps with CortexOps {
+class PublicAction(actionSrv: ActionSrv, val organisationSrv: OrganisationSrv, db: Database) extends PublicData with CortexOps with ActionOps {
 
   override val entityName: String = "action"
   override val initialQuery: Query =
-    Query.init[Traversal.V[Action]]("listAction", (graph, authContext) => actionSrv.startTraversal(graph).visible(organisationSrv)(authContext))
+    Query.init[Traversal.V[Action]]("listAction", (graph, authContext) => actionSrv.startTraversal(graph).visible(authContext))
   override val getQuery: ParamQuery[EntityIdOrName] = Query.initWithParam[EntityIdOrName, Traversal.V[Action]](
     "getAction",
-    (idOrName, graph, authContext) => actionSrv.get(idOrName)(graph).visible(organisationSrv)(authContext)
+    (idOrName, graph, authContext) => actionSrv.get(idOrName)(graph).visible(authContext)
   )
   override val pageQuery: ParamQuery[OutputParam] = Query.withParam[OutputParam, Traversal.V[Action], IteratorOutput](
     "page",

@@ -4,13 +4,13 @@ import org.thp.scalligraph.EntityName
 import org.thp.scalligraph.auth.AuthContext
 import org.thp.scalligraph.models.DummyUserSrv
 import org.thp.thehive.models.Alert
-import org.thp.thehive.services.{TestAppBuilder, TheHiveOps}
+import org.thp.thehive.services.{TestAppBuilder, TheHiveOpsNoDeps}
 import play.api.test.PlaySpecification
 
 import java.util.Date
 import scala.util.Success
 
-class AlertCreatedTest extends PlaySpecification with TestAppBuilder with TheHiveOps {
+class AlertCreatedTest extends PlaySpecification with TestAppBuilder with TheHiveOpsNoDeps {
   implicit val authContext: AuthContext = DummyUserSrv(userId = "certuser@thehive.local", organisation = "cert").authContext
 
   "alert created trigger" should {

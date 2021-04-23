@@ -79,7 +79,7 @@ class NotificationActor(
     cache: SyncCacheApi,
     db: Database
 ) extends Actor
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
   import context.dispatcher
   lazy val logger: Logger = Logger(getClass)
   val roles: Set[String]  = configuration.get[Seq[String]]("roles").toSet

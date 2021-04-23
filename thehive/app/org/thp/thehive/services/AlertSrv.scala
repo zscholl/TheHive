@@ -30,7 +30,7 @@ class AlertSrv(
     attachmentSrv: AttachmentSrv,
     integrityCheckActor: => ActorRef @@ IntegrityCheckTag
 ) extends VertexSrv[Alert]
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
 
   val alertTagSrv          = new EdgeSrv[AlertTag, Alert, Tag]
   val alertCustomFieldSrv  = new EdgeSrv[AlertCustomField, Alert, CustomField]
@@ -358,9 +358,9 @@ class AlertSrv(
     }
 }
 
-trait AlertOps { _: TheHiveOps =>
+trait AlertOpsNoDeps { _: TheHiveOpsNoDeps =>
 
-  implicit class AlertOpsDefs(traversal: Traversal.V[Alert]) {
+  implicit class AlertOpsNoDepsDefs(traversal: Traversal.V[Alert]) {
     def get(idOrSource: EntityIdOrName): Traversal.V[Alert] =
       idOrSource.fold(
         traversal.getByIds(_),
@@ -389,14 +389,6 @@ trait AlertOps { _: TheHiveOps =>
 
     def `case`: Traversal.V[Case] = traversal.out[AlertCase].v[Case]
 
-    def visible(organisationSrv: OrganisationSrv)(implicit authContext: AuthContext): Traversal.V[Alert] =
-      traversal.has(_.organisationId, organisationSrv.currentId(traversal.graph, authContext))
-
-    def can(organisationSrv: OrganisationSrv, permission: Permission)(implicit authContext: AuthContext): Traversal.V[Alert] =
-      if (authContext.permissions.contains(permission))
-        traversal.visible(organisationSrv)
-      else traversal.empty
-
     def imported: Traversal[Boolean, Boolean, IdentityConverter[Boolean]] =
       traversal.choose(_.nonEmptyId(_.caseId), onTrue = true, onFalse = false)
 
@@ -417,44 +409,6 @@ trait AlertOps { _: TheHiveOps =>
           .sack[Long],
         _.constant(0L)
       )
-
-    def similarCases(organisationSrv: OrganisationSrv, caseFilter: Option[Traversal.V[Case] => Traversal.V[Case]])(implicit
-        authContext: AuthContext
-    ): Traversal[(RichCase, SimilarStats), JMap[String, Any], Converter[(RichCase, SimilarStats), JMap[String, Any]]] = {
-      val similarObservables = observables
-        .filteredSimilar
-        .visible(organisationSrv)
-      caseFilter
-        .fold(similarObservables)(caseFilter => similarObservables.filter(o => caseFilter(o.`case`)))
-        .group(_.by(_.`case`))
-        .unfold
-        .project(
-          _.by(
-            _.selectKeys
-              .project(
-                _.by(_.richCaseWithoutPerms)
-                  .by((_: Traversal.V[Case]).observables.hasNot(_.ignoreSimilarity, true).groupCount(_.byValue(_.ioc)))
-              )
-          )
-            .by(
-              _.selectValues
-                .project(
-                  _.by(_.unfold.groupCount(_.byValue(_.ioc)))
-                    .by(_.unfold.groupCount(_.by(_.typeName)))
-                )
-            )
-        )
-        .domainMap {
-          case ((richCase, obsStats), (iocStats, observableTypeStats)) =>
-            val obsStatsMap     = obsStats.mapValues(_.toInt)
-            val similarStatsMap = iocStats.mapValues(_.toInt)
-            richCase -> SimilarStats(
-              similarStatsMap.values.sum         -> obsStatsMap.values.sum,
-              similarStatsMap.getOrElse(true, 0) -> obsStatsMap.getOrElse(true, 0),
-              observableTypeStats
-            )
-        }
-    }
 
     def customFields(idOrName: EntityIdOrName): Traversal.E[AlertCustomField] =
       idOrName
@@ -590,9 +544,61 @@ trait AlertOps { _: TheHiveOps =>
   implicit class AlertCustomFieldsOpsDefs(traversal: Traversal.E[AlertCustomField]) extends CustomFieldValueOpsDefs(traversal)
 }
 
+trait AlertOps { _: TheHiveOps =>
+  protected val organisationSrv: OrganisationSrv
+  implicit class AlertOpsDefs(traversal: Traversal.V[Alert]) {
+    def visible(implicit authContext: AuthContext): Traversal.V[Alert] =
+      traversal.has(_.organisationId, organisationSrv.currentId(traversal.graph, authContext))
+
+    def can(permission: Permission)(implicit authContext: AuthContext): Traversal.V[Alert] =
+      if (authContext.permissions.contains(permission))
+        traversal.visible
+      else traversal.empty
+
+    def similarCases(caseFilter: Option[Traversal.V[Case] => Traversal.V[Case]])(implicit
+        authContext: AuthContext
+    ): Traversal[(RichCase, SimilarStats), JMap[String, Any], Converter[(RichCase, SimilarStats), JMap[String, Any]]] = {
+      val similarObservables = traversal
+        .observables
+        .filteredSimilar
+        .visible
+      caseFilter
+        .fold(similarObservables)(caseFilter => similarObservables.filter(o => caseFilter(o.`case`)))
+        .group(_.by(_.`case`))
+        .unfold
+        .project(
+          _.by(
+            _.selectKeys
+              .project(
+                _.by(_.richCaseWithoutPerms)
+                  .by((_: Traversal.V[Case]).observables.hasNot(_.ignoreSimilarity, true).groupCount(_.byValue(_.ioc)))
+              )
+          )
+            .by(
+              _.selectValues
+                .project(
+                  _.by(_.unfold.groupCount(_.byValue(_.ioc)))
+                    .by(_.unfold.groupCount(_.by(_.typeName)))
+                )
+            )
+        )
+        .domainMap {
+          case ((richCase, obsStats), (iocStats, observableTypeStats)) =>
+            val obsStatsMap     = obsStats.mapValues(_.toInt)
+            val similarStatsMap = iocStats.mapValues(_.toInt)
+            richCase -> SimilarStats(
+              similarStatsMap.values.sum         -> obsStatsMap.values.sum,
+              similarStatsMap.getOrElse(true, 0) -> obsStatsMap.getOrElse(true, 0),
+              observableTypeStats
+            )
+        }
+    }
+  }
+
+}
 class AlertIntegrityCheckOps(val db: Database, val service: AlertSrv, organisationSrv: OrganisationSrv)
     extends IntegrityCheckOps[Alert]
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
 
   override def resolve(entities: Seq[Alert with Entity])(implicit graph: Graph): Try[Unit] = {
     val (imported, notImported) = entities.partition(_.caseId.isDefined)

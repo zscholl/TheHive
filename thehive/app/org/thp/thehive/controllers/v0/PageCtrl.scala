@@ -8,7 +8,7 @@ import org.thp.scalligraph.traversal.{IteratorOutput, Traversal}
 import org.thp.thehive.controllers.v0.Conversion._
 import org.thp.thehive.dto.v0.InputPage
 import org.thp.thehive.models.{Page, Permissions}
-import org.thp.thehive.services.{OrganisationSrv, PageSrv, TheHiveOps}
+import org.thp.thehive.services.{OrganisationSrv, PageSrv, TheHiveOpsNoDeps}
 import play.api.mvc._
 
 class PageCtrl(
@@ -18,7 +18,7 @@ class PageCtrl(
     override val queryExecutor: QueryExecutor,
     override val publicData: PublicPage
 ) extends QueryCtrl
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
   def get(idOrTitle: String): Action[AnyContent] =
     entrypoint("get a page")
       .authRoTransaction(db) { implicit request => implicit graph =>
@@ -62,7 +62,7 @@ class PageCtrl(
       }
 }
 
-class PublicPage(pageSrv: PageSrv, organisationSrv: OrganisationSrv) extends PublicData with TheHiveOps {
+class PublicPage(pageSrv: PageSrv, organisationSrv: OrganisationSrv) extends PublicData with TheHiveOpsNoDeps {
   override val entityName: String = "page"
   override val initialQuery: Query =
     Query.init[Traversal.V[Page]]("listPage", (graph, authContext) => organisationSrv.get(authContext.organisation)(graph).pages)

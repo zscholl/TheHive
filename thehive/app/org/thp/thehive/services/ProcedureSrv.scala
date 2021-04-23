@@ -18,7 +18,7 @@ class ProcedureSrv(
     caseSrv: CaseSrv,
     patternSrv: PatternSrv
 ) extends VertexSrv[Procedure]
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
   val caseProcedureSrv    = new EdgeSrv[CaseProcedure, Case, Procedure]
   val procedurePatternSrv = new EdgeSrv[ProcedurePattern, Procedure, Pattern]
 
@@ -55,7 +55,7 @@ class ProcedureSrv(
 
 }
 
-trait ProcedureOps { _: TheHiveOps =>
+trait ProcedureOps { _: TheHiveOpsNoDeps =>
   implicit class ProcedureOpsDefs(traversal: Traversal.V[Procedure]) {
 
     def pattern: Traversal.V[Pattern] =

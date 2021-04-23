@@ -8,7 +8,7 @@ import org.thp.thehive.models._
 
 import scala.util.Try
 
-class RoleSrv extends VertexSrv[Role] with TheHiveOps {
+class RoleSrv extends VertexSrv[Role] with TheHiveOpsNoDeps {
 
   val roleOrganisationSrv = new EdgeSrv[RoleOrganisation, Role, Organisation]
   val userRoleSrv         = new EdgeSrv[UserRole, User, Role]
@@ -35,7 +35,7 @@ class RoleSrv extends VertexSrv[Role] with TheHiveOps {
   }
 }
 
-trait RoleOps { _: TheHiveOps =>
+trait RoleOps { _: TheHiveOpsNoDeps =>
   implicit class RoleOpsDefs(traversal: Traversal.V[Role]) {
     def organisation: Traversal.V[Organisation] = traversal.out[RoleOrganisation].v[Organisation]
 

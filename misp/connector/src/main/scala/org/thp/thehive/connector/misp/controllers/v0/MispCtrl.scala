@@ -19,7 +19,7 @@ class MispCtrl(
     alertSrv: AlertSrv,
     caseSrv: CaseSrv,
     db: Database,
-    organisationSrv: OrganisationSrv,
+    val organisationSrv: OrganisationSrv,
     mispActor: ActorRef @@ MispTag,
     implicit val ec: ExecutionContext
 ) extends TheHiveOps {
@@ -51,7 +51,7 @@ class MispCtrl(
         alertSrv
           .startTraversal
           .filterByType("misp")
-          .visible(organisationSrv)
+          .visible
           .toIterator
           .toTry(alertSrv.remove(_))
           .map(_ => Results.NoContent)

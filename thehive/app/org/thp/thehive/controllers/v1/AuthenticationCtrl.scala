@@ -6,7 +6,7 @@ import org.thp.scalligraph.models.Database
 import org.thp.scalligraph.{AuthenticationError, AuthorizationError, BadRequestError, EntityIdOrName, MultiFactorCodeRequired}
 import org.thp.thehive.controllers.v1.Conversion._
 import org.thp.thehive.models.Permissions
-import org.thp.thehive.services.{TOTPAuthSrv, TheHiveOps, UserSrv}
+import org.thp.thehive.services.{TOTPAuthSrv, TheHiveOpsNoDeps, UserSrv}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Results}
 
@@ -18,7 +18,7 @@ class AuthenticationCtrl(
     requestOrganisation: RequestOrganisation,
     userSrv: UserSrv,
     implicit val db: Database
-) extends TheHiveOps {
+) extends TheHiveOpsNoDeps {
 
   def login: Action[AnyContent] =
     entrypoint("login")

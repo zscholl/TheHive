@@ -20,7 +20,7 @@ class ProfileSrv(
     integrityCheckActor: => ActorRef @@ IntegrityCheckTag,
     db: Database
 ) extends VertexSrv[Profile]
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
   lazy val orgAdmin: Profile with Entity = db.roTransaction(graph => getOrFail(EntityName(Profile.orgAdmin.name))(graph)).get
 
   override def createEntity(e: Profile)(implicit graph: Graph, authContext: AuthContext): Try[Profile with Entity] = {
@@ -59,7 +59,7 @@ class ProfileSrv(
     else super.update(traversal, propertyUpdaters)
 }
 
-trait ProfileOps { _: TheHiveOps =>
+trait ProfileOps { _: TheHiveOpsNoDeps =>
 
   implicit class ProfileOpsDefs(traversal: Traversal.V[Profile]) {
 

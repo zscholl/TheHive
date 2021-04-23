@@ -1,10 +1,10 @@
 package org.thp.thehive.controllers.v0
 
-import org.thp.thehive.services.TheHiveOps
+import org.thp.thehive.services.TheHiveOpsNoDeps
 import play.api.libs.json.Json
 import play.api.test.{FakeRequest, PlaySpecification}
 
-class LogCtrlTest extends PlaySpecification with TestAppBuilder with TheHiveOps {
+class LogCtrlTest extends PlaySpecification with TestAppBuilder with TheHiveOpsNoDeps {
 
   "log controller" should {
 

@@ -10,7 +10,7 @@ import org.thp.scalligraph.traversal.Traversal
 import org.thp.scalligraph.utils.RichType
 import org.thp.scalligraph.{BadRequestError, EntityId, EntityIdOrName}
 import org.thp.thehive.models._
-import org.thp.thehive.services.TheHiveOps
+import org.thp.thehive.services.TheHiveOpsNoDeps
 
 import scala.reflect.runtime.{universe => ru}
 
@@ -110,7 +110,7 @@ object ParentIdFilter {
       .fold(Some(_), _ => None)
 }
 
-class ParentIdInputFilter(parentType: String, parentId: String) extends InputQuery[Traversal.Unk, Traversal.Unk] with TheHiveOps {
+class ParentIdInputFilter(parentType: String, parentId: String) extends InputQuery[Traversal.Unk, Traversal.Unk] with TheHiveOpsNoDeps {
   override def apply(
       publicProperties: PublicProperties,
       traversalType: ru.Type,
@@ -168,7 +168,7 @@ object ParentQueryFilter {
 
 class ParentQueryInputFilter(parentType: String, parentFilter: InputQuery[Traversal.Unk, Traversal.Unk])
     extends InputQuery[Traversal.Unk, Traversal.Unk]
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
   override def apply(
       publicProperties: PublicProperties,
       traversalType: ru.Type,
@@ -211,7 +211,7 @@ object ChildQueryFilter {
 
 class ChildQueryInputFilter(childType: String, childFilter: InputQuery[Traversal.Unk, Traversal.Unk])
     extends InputQuery[Traversal.Unk, Traversal.Unk]
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
   override def apply(
       publicProperties: PublicProperties,
       traversalType: ru.Type,

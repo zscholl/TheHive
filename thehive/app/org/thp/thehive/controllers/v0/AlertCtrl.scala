@@ -41,7 +41,7 @@ class AlertCtrl(
     userSrv: UserSrv,
     caseSrv: CaseSrv,
     observableSrv: ObservableSrv,
-    organisationSrv: OrganisationSrv,
+    val organisationSrv: OrganisationSrv,
     override val publicData: PublicAlert,
     implicit val db: Database,
     override val queryExecutor: QueryExecutor
@@ -73,7 +73,7 @@ class AlertCtrl(
   def alertSimilarityRenderer(implicit
       authContext: AuthContext
   ): Traversal.V[Alert] => Traversal[JsArray, JList[JMap[String, Any]], Converter[JsArray, JList[JMap[String, Any]]]] =
-    _.similarCases(organisationSrv, caseFilter = None)
+    _.similarCases(caseFilter = None)
       .fold
       .domainMap { similarCases =>
         JsArray {
@@ -105,7 +105,7 @@ class AlertCtrl(
         val alert =
           alertSrv
             .get(EntityIdOrName(alertId))
-            .visible(organisationSrv)
+            .visible
         if (similarity.contains(true))
           alert
             .richAlertWithCustomRenderer(alertSimilarityRenderer(request))
@@ -135,7 +135,7 @@ class AlertCtrl(
       .authPermittedTransaction(db, Permissions.manageAlert) { implicit request => implicit graph =>
         val propertyUpdaters: Seq[PropertyUpdater] = request.body("alert")
         alertSrv
-          .update(_.get(EntityIdOrName(alertIdOrName)).visible(organisationSrv), propertyUpdaters)
+          .update(_.get(EntityIdOrName(alertIdOrName)).visible, propertyUpdaters)
           .flatMap { case (alertSteps, _) => alertSteps.richAlert.getOrFail("Alert") }
           .map { richAlert =>
             val alertWithObservables: (RichAlert, Seq[RichObservable]) = richAlert -> alertSrv.get(richAlert.alert).observables.richObservable.toSeq
@@ -150,7 +150,7 @@ class AlertCtrl(
           alert <-
             alertSrv
               .get(EntityIdOrName(alertIdOrName))
-              .visible(organisationSrv)
+              .visible
               .getOrFail("Alert")
           _ <- alertSrv.remove(alert)
         } yield Results.NoContent
@@ -167,7 +167,7 @@ class AlertCtrl(
               alert <-
                 alertSrv
                   .get(EntityIdOrName(alertId))
-                  .visible(organisationSrv)
+                  .visible
                   .getOrFail("Alert")
               _ <- alertSrv.remove(alert)
             } yield ()
@@ -179,7 +179,7 @@ class AlertCtrl(
     entrypoint("merge alert with case")
       .authPermittedTransaction(db, Permissions.manageAlert) { implicit request => implicit graph =>
         for {
-          alert    <- alertSrv.get(EntityIdOrName(alertIdOrName)).visible(organisationSrv).getOrFail("Alert")
+          alert    <- alertSrv.get(EntityIdOrName(alertIdOrName)).visible.getOrFail("Alert")
           case0    <- caseSrv.get(EntityIdOrName(caseIdOrName)).can(Permissions.manageCase).getOrFail("Case")
           _        <- alertSrv.mergeInCase(alert, case0)
           richCase <- caseSrv.get(EntityIdOrName(caseIdOrName)).richCase.getOrFail("Case")
@@ -206,7 +206,7 @@ class AlertCtrl(
               alert <-
                 alertSrv
                   .get(EntityIdOrName(alertId))
-                  .visible(organisationSrv)
+                  .visible
                   .getOrFail("Alert")
               updatedCase <- alertSrv.mergeInCase(alert, case0)
             } yield updatedCase
@@ -222,7 +222,7 @@ class AlertCtrl(
           alert <-
             alertSrv
               .get(EntityIdOrName(alertId))
-              .visible(organisationSrv)
+              .visible
               .getOrFail("Alert")
           _ <- alertSrv.markAsRead(alert._id)
           alertWithObservables <-
@@ -240,7 +240,7 @@ class AlertCtrl(
           alert <-
             alertSrv
               .get(EntityIdOrName(alertId))
-              .visible(organisationSrv)
+              .visible
               .getOrFail("Alert")
           _ <- alertSrv.markAsUnread(alert._id)
           alertWithObservables <-
@@ -261,7 +261,7 @@ class AlertCtrl(
           alert <-
             alertSrv
               .get(EntityIdOrName(alertId))
-              .visible(organisationSrv)
+              .visible
               .richAlert
               .getOrFail("Alert")
           _ <- caseTemplate.map(ct => caseTemplateSrv.get(EntityIdOrName(ct)).visible.existsOrFail).flip
@@ -278,7 +278,7 @@ class AlertCtrl(
           alert <-
             alertSrv
               .get(EntityIdOrName(alertId))
-              .visible(organisationSrv)
+              .visible
               .getOrFail("Alert")
           _ <- alertSrv.followAlert(alert._id)
           alertWithObservables <-
@@ -296,7 +296,7 @@ class AlertCtrl(
           alert <-
             alertSrv
               .get(EntityIdOrName(alertId))
-              .visible(organisationSrv)
+              .visible
               .getOrFail("Alert")
           _ <- alertSrv.unfollowAlert(alert._id)
           alertWithObservables <-
@@ -337,7 +337,7 @@ class AlertCtrl(
 
 class PublicAlert(
     alertSrv: AlertSrv,
-    organisationSrv: OrganisationSrv,
+    val organisationSrv: OrganisationSrv,
     customFieldSrv: CustomFieldSrv,
     db: Database
 ) extends PublicData
@@ -350,11 +350,11 @@ class PublicAlert(
     Query
       .init[Traversal.V[Alert]](
         "listAlert",
-        (graph, authContext) => alertSrv.startTraversal(graph).visible(organisationSrv)(authContext)
+        (graph, authContext) => alertSrv.startTraversal(graph).visible(authContext)
       )
   override val getQuery: ParamQuery[EntityIdOrName] = Query.initWithParam[EntityIdOrName, Traversal.V[Alert]](
     "getAlert",
-    (idOrName, graph, authContext) => alertSrv.get(idOrName)(graph).visible(organisationSrv)(authContext)
+    (idOrName, graph, authContext) => alertSrv.get(idOrName)(graph).visible(authContext)
   )
   override val pageQuery: ParamQuery[OutputParam] =
     Query.withParam[OutputParam, Traversal.V[Alert], IteratorOutput](

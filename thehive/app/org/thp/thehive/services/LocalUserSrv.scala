@@ -18,7 +18,7 @@ class LocalUserSrv(
     profileSrv: ProfileSrv,
     configuration: Configuration
 ) extends ScalligraphUserSrv
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
 
   override def getAuthContext(request: RequestHeader, userId: String, organisationName: Option[EntityIdOrName]): Try[AuthContext] =
     db.roTransaction { implicit graph =>

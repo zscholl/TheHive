@@ -7,13 +7,13 @@ import org.thp.scalligraph.models.DummyUserSrv
 import org.thp.scalligraph.{EntityId, EntityName}
 import org.thp.thehive.connector.misp.TestAppBuilder
 import org.thp.thehive.models.{Alert, Permissions}
-import org.thp.thehive.services.TheHiveOps
+import org.thp.thehive.services.{TheHiveOps, TheHiveOpsNoDeps}
 import play.api.test.PlaySpecification
 
 import java.util.{Date, UUID}
 import scala.concurrent.duration.DurationInt
 
-class MispImportSrvTest extends PlaySpecification with TestAppBuilder with TheHiveOps {
+class MispImportSrvTest extends PlaySpecification with TestAppBuilder with TheHiveOpsNoDeps {
   sequential
 
   implicit val authContext: AuthContext =
@@ -81,33 +81,37 @@ class MispImportSrvTest extends PlaySpecification with TestAppBuilder with TheHi
       import app.mispConnector._
       import app.thehiveModule._
 
-      database.roTransaction { implicit graph =>
-        mispImportSrv.syncMispEvents(theHiveMispClient)
-        alertSrv.startTraversal.getBySourceId("misp", "ORGNAME", "1").visible(organisationSrv).getOrFail("Alert")
-      } must beSuccessfulTry
-        .which { alert: Alert =>
-          alert must beEqualTo(
-            Alert(
-              `type` = "misp",
-              source = "ORGNAME",
-              sourceRef = "1",
-              externalLink = Some("https://misp.test/events/1"),
-              title = "#1 test1 -> 1.2",
-              description = s"Imported from MISP Event #1, created at ${Event.simpleDateFormat.parse("2019-08-23")}",
-              severity = 3,
-              date = Event.simpleDateFormat.parse("2019-08-23"),
-              lastSyncDate = new Date(1566913355000L),
-              tlp = 2,
-              pap = 2,
-              read = false,
-              follow = true,
-              tags = Seq("TH-test", "TH-test-2"),
-              organisationId = alert.organisationId,
-              caseId = EntityId.empty
+      TheHiveOps(organisationSrv) { ops =>
+        import ops.AlertOpsDefs
+
+        database.roTransaction { implicit graph =>
+          mispImportSrv.syncMispEvents(theHiveMispClient)
+          alertSrv.startTraversal.getBySourceId("misp", "ORGNAME", "1").visible.getOrFail("Alert")
+        } must beSuccessfulTry
+          .which { alert: Alert =>
+            alert must beEqualTo(
+              Alert(
+                `type` = "misp",
+                source = "ORGNAME",
+                sourceRef = "1",
+                externalLink = Some("https://misp.test/events/1"),
+                title = "#1 test1 -> 1.2",
+                description = s"Imported from MISP Event #1, created at ${Event.simpleDateFormat.parse("2019-08-23")}",
+                severity = 3,
+                date = Event.simpleDateFormat.parse("2019-08-23"),
+                lastSyncDate = new Date(1566913355000L),
+                tlp = 2,
+                pap = 2,
+                read = false,
+                follow = true,
+                tags = Seq("TH-test", "TH-test-2"),
+                organisationId = alert.organisationId,
+                caseId = EntityId.empty
+              )
             )
-          )
-        }
-        .eventually(5, 100.milliseconds)
+          }
+          .eventually(5, 100.milliseconds)
+      }
 
       val observables = database
         .roTransaction { implicit graph =>

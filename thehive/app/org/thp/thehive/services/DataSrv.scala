@@ -15,7 +15,7 @@ import java.lang.{Long => JLong}
 import scala.collection.mutable
 import scala.util.{Success, Try}
 
-class DataSrv(integrityCheckActor: => ActorRef @@ IntegrityCheckTag) extends VertexSrv[Data] with TheHiveOps {
+class DataSrv(integrityCheckActor: => ActorRef @@ IntegrityCheckTag) extends VertexSrv[Data] with TheHiveOpsNoDeps {
   override def createEntity(e: Data)(implicit graph: Graph, authContext: AuthContext): Try[Data with Entity] =
     super.createEntity(e).map { data =>
       integrityCheckActor ! EntityAdded("Data")
@@ -34,7 +34,7 @@ class DataSrv(integrityCheckActor: => ActorRef @@ IntegrityCheckTag) extends Ver
     startTraversal.getByData(name)
 }
 
-trait DataOps { _: TheHiveOps =>
+trait DataOps { _: TheHiveOpsNoDeps =>
 
   implicit class DataOpsDefs(traversal: Traversal.V[Data]) {
     def observables: Traversal.V[Observable] = traversal.in[ObservableData].v[Observable]

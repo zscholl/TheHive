@@ -11,7 +11,7 @@ import org.thp.thehive.models._
 
 import scala.util.{Failure, Success, Try}
 
-class ObservableTypeSrv(integrityCheckActor: => ActorRef @@ IntegrityCheckTag) extends VertexSrv[ObservableType] with TheHiveOps {
+class ObservableTypeSrv(integrityCheckActor: => ActorRef @@ IntegrityCheckTag) extends VertexSrv[ObservableType] with TheHiveOpsNoDeps {
 
   val observableObservableTypeSrv = new EdgeSrv[ObservableObservableType, Observable, ObservableType]
 
@@ -39,7 +39,7 @@ class ObservableTypeSrv(integrityCheckActor: => ActorRef @@ IntegrityCheckTag) e
     get(idOrName).in[ObservableObservableType].getCount
 }
 
-trait ObservableTypeOps { _: TheHiveOps =>
+trait ObservableTypeOps { _: TheHiveOpsNoDeps =>
 
   implicit class ObservableTypeObs(traversal: Traversal.V[ObservableType]) {
 

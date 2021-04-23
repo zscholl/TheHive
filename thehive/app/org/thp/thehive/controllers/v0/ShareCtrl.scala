@@ -22,7 +22,7 @@ class ShareCtrl(
     observableSrv: ObservableSrv,
     profileSrv: ProfileSrv,
     implicit val db: Database
-) extends TheHiveOps {
+) extends TheHiveOpsNoDeps {
 
   def shareCase(caseId: String): Action[AnyContent] =
     entrypoint("create case shares")

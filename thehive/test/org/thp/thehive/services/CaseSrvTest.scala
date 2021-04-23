@@ -14,7 +14,7 @@ import play.api.test.PlaySpecification
 import java.util.Date
 import scala.util.Success
 
-class CaseSrvTest extends PlaySpecification with TestAppBuilder with TheHiveOps {
+class CaseSrvTest extends PlaySpecification with TestAppBuilder with TheHiveOpsNoDeps {
   implicit val authContext: AuthContext =
     DummyUserSrv(userId = "certuser@thehive.local", organisation = "cert", permissions = Profile.analyst.permissions).authContext
 
@@ -481,8 +481,14 @@ class CaseSrvTest extends PlaySpecification with TestAppBuilder with TheHiveOps 
       import app._
       import app.thehiveModule._
 
-      database.roTransaction { implicit graph =>
-        caseSrv.get(EntityName("3")).visible(organisationSrv).getOrFail("Case") must beFailedTry
+      TheHiveOps(organisationSrv) { ops =>
+        import ops.CaseOpsDefs
+        database.roTransaction { implicit graph =>
+          caseSrv
+            .get(EntityName("3"))
+            .visible
+            .getOrFail("Case") must beFailedTry
+        }
       }
     }
 

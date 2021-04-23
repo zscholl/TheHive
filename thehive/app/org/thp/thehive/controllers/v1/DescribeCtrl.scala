@@ -39,7 +39,7 @@ class TheHiveModelDescription(
     resolutionStatusSrv: ResolutionStatusSrv,
     db: Database
 ) extends ModelDescription
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
 
   val metadata = Seq(
     PropertyDescription("_createdBy", "user"),

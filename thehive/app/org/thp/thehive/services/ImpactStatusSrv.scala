@@ -11,7 +11,7 @@ import org.thp.thehive.models.ImpactStatus
 
 import scala.util.{Failure, Success, Try}
 
-class ImpactStatusSrv(integrityCheckActor: => ActorRef @@ IntegrityCheckTag) extends VertexSrv[ImpactStatus] with TheHiveOps {
+class ImpactStatusSrv(integrityCheckActor: => ActorRef @@ IntegrityCheckTag) extends VertexSrv[ImpactStatus] with TheHiveOpsNoDeps {
 
   override def getByName(name: String)(implicit graph: Graph): Traversal.V[ImpactStatus] =
     startTraversal.getByName(name)
@@ -30,7 +30,7 @@ class ImpactStatusSrv(integrityCheckActor: => ActorRef @@ IntegrityCheckTag) ext
   override def exists(e: ImpactStatus)(implicit graph: Graph): Boolean = startTraversal.getByName(e.value).exists
 }
 
-trait ImpactStatusOps { _: TheHiveOps =>
+trait ImpactStatusOps { _: TheHiveOpsNoDeps =>
   implicit class ImpactStatusOpsDefs(traversal: Traversal.V[ImpactStatus]) {
     def get(idOrName: EntityIdOrName): Traversal.V[ImpactStatus] =
       idOrName.fold(traversal.getByIds(_), getByName)

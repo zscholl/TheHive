@@ -22,7 +22,7 @@ class ConfigCtrl(
     userSrv: UserSrv,
     entrypoint: Entrypoint,
     db: Database
-) extends TheHiveOps {
+) extends TheHiveOpsNoDeps {
 
   lazy val logger: Logger = Logger(getClass)
 

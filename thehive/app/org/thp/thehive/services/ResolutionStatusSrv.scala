@@ -11,7 +11,7 @@ import org.thp.thehive.models.ResolutionStatus
 
 import scala.util.{Failure, Success, Try}
 
-class ResolutionStatusSrv(integrityCheckActor: => ActorRef @@ IntegrityCheckTag) extends VertexSrv[ResolutionStatus] with TheHiveOps {
+class ResolutionStatusSrv(integrityCheckActor: => ActorRef @@ IntegrityCheckTag) extends VertexSrv[ResolutionStatus] with TheHiveOpsNoDeps {
 
   override def getByName(name: String)(implicit graph: Graph): Traversal.V[ResolutionStatus] =
     startTraversal.getByName(name)
@@ -30,7 +30,7 @@ class ResolutionStatusSrv(integrityCheckActor: => ActorRef @@ IntegrityCheckTag)
   override def exists(e: ResolutionStatus)(implicit graph: Graph): Boolean = startTraversal.getByName(e.value).exists
 }
 
-trait ResolutionStatusOps { _: TheHiveOps =>
+trait ResolutionStatusOps { _: TheHiveOpsNoDeps =>
   implicit class ResolutionStatusOpsDefs(traversal: Traversal.V[ResolutionStatus]) {
     def get(idOrName: EntityIdOrName): Traversal.V[ResolutionStatus] =
       idOrName.fold(traversal.getByIds(_), getByName)

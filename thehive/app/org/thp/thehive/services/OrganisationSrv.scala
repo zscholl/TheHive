@@ -25,7 +25,7 @@ class OrganisationSrv(
     integrityCheckActor: => ActorRef @@ IntegrityCheckTag,
     cache: SyncCacheApi
 ) extends VertexSrv[Organisation]
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
   lazy val taxonomySrv: TaxonomySrv = _taxonomySrv
   lazy val roleSrv: RoleSrv         = _roleSrv
   lazy val profileSrv: ProfileSrv   = _profileSrv
@@ -134,7 +134,7 @@ class OrganisationSrv(
   }
 }
 
-trait OrganisationOps { _: TheHiveOps =>
+trait OrganisationOps { _: TheHiveOpsNoDeps =>
 
   implicit class OrganisationOpsDefs(traversal: Traversal.V[Organisation]) {
 

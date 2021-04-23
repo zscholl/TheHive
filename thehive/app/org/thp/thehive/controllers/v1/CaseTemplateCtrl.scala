@@ -8,7 +8,7 @@ import org.thp.scalligraph.traversal.{IteratorOutput, Traversal}
 import org.thp.thehive.controllers.v1.Conversion._
 import org.thp.thehive.dto.v1.InputCaseTemplate
 import org.thp.thehive.models.{CaseTemplate, Permissions, RichCaseTemplate, Task}
-import org.thp.thehive.services.{CaseTemplateSrv, OrganisationSrv, TheHiveOps}
+import org.thp.thehive.services.{CaseTemplateSrv, OrganisationSrv, TheHiveOpsNoDeps}
 import play.api.mvc.{Action, AnyContent, Results}
 
 import scala.util.Success
@@ -20,7 +20,7 @@ class CaseTemplateCtrl(
     organisationSrv: OrganisationSrv,
     implicit val db: Database
 ) extends QueryableCtrl
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
 
   override val entityName: String                 = "caseTemplate"
   override val publicProperties: PublicProperties = properties.caseTemplate

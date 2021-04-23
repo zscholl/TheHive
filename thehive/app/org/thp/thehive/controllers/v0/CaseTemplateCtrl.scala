@@ -26,7 +26,7 @@ class CaseTemplateCtrl(
     implicit override val db: Database,
     override val queryExecutor: QueryExecutor
 ) extends QueryCtrl
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
   def create: Action[AnyContent] =
     entrypoint("create case template")
       .extract("caseTemplate", FieldsParser[InputCaseTemplate])
@@ -88,7 +88,7 @@ class PublicCaseTemplate(
     organisationSrv: OrganisationSrv,
     customFieldSrv: CustomFieldSrv
 ) extends PublicData
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
   lazy val logger: Logger         = Logger(getClass)
   override val entityName: String = "caseTemplate"
   override val initialQuery: Query =

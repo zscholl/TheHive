@@ -17,7 +17,7 @@ class ConfigSrv(
     userSrv: UserSrv,
     db: Database
 ) extends VertexSrv[Config]
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
   val organisationConfigSrv = new EdgeSrv[OrganisationConfig, Organisation, Config]
   val userConfigSrv         = new EdgeSrv[UserConfig, User, Config]
 
@@ -67,7 +67,7 @@ class ConfigSrv(
   }
 }
 
-trait ConfigOps { _: TheHiveOps =>
+trait ConfigOps { _: TheHiveOpsNoDeps =>
 
   implicit class ConfigOpsDefs(traversal: Traversal.V[Config]) {
     def triggerMap(notificationSrv: NotificationSrv): Map[EntityId, Map[Trigger, (Boolean, Seq[EntityId])]] = {

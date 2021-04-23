@@ -23,7 +23,7 @@ class Properties(
     customFieldSrv: CustomFieldSrv,
     organisationSrv: OrganisationSrv,
     db: Database
-) extends TheHiveOps {
+) extends TheHiveOpsNoDeps {
 
   lazy val metaProperties: PublicProperties =
     PublicPropertyListBuilder

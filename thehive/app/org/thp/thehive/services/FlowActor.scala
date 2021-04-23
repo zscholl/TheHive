@@ -30,7 +30,7 @@ class FlowActor(
     cache: SyncCacheApi,
     caseSrv: CaseSrv,
     observableSrv: ObservableSrv,
-    organisationSrv: OrganisationSrv,
+    val organisationSrv: OrganisationSrv,
     taskSrv: TaskSrv,
     db: Database,
     appConfig: ApplicationConfig,
@@ -56,15 +56,15 @@ class FlowActor(
           .has(_.mainAction, true)
           .has(_._createdAt, P.gt(fromDate))
           .sort(_.by("_createdAt", Order.desc))
-          .visible(organisationSrv)
+          .visible
           .limit(10)
           ._id
       case Some(cid) =>
         graph
           .union(
-            caseSrv.filterTraversal(_).get(cid).visible(organisationSrv).in[AuditContext],
-            observableSrv.filterTraversal(_).visible(organisationSrv).relatedTo(caseSrv.caseId(cid)).in[AuditContext],
-            taskSrv.filterTraversal(_).visible(organisationSrv).relatedTo(caseSrv.caseId(cid)).in[AuditContext]
+            caseSrv.filterTraversal(_).get(cid).visible.in[AuditContext],
+            observableSrv.filterTraversal(_).visible.relatedTo(caseSrv.caseId(cid)).in[AuditContext],
+            taskSrv.filterTraversal(_).visible.relatedTo(caseSrv.caseId(cid)).in[AuditContext]
           )
           .v[Audit]
           .has(_.mainAction, true)

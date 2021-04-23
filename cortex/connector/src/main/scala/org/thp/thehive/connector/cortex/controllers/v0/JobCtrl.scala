@@ -11,7 +11,7 @@ import org.thp.thehive.connector.cortex.services.{CortexOps, JobSrv}
 import org.thp.thehive.controllers.v0.Conversion._
 import org.thp.thehive.controllers.v0.{OutputParam, PublicData, QueryCtrl}
 import org.thp.thehive.models.{Observable, Permissions, RichCase, RichObservable}
-import org.thp.thehive.services.{ObservableSrv, TheHiveOps}
+import org.thp.thehive.services.{ObservableSrv, TheHiveOpsNoDeps}
 import play.api.mvc.{Action, AnyContent, Results}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -26,7 +26,7 @@ class JobCtrl(
     override val publicData: PublicJob
 ) extends QueryCtrl
     with CortexOps
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
   def get(jobId: String): Action[AnyContent] =
     entrypoint("get job")
       .authRoTransaction(db) { implicit request => implicit graph =>
@@ -66,7 +66,7 @@ class JobCtrl(
       }
 }
 
-class PublicJob(jobSrv: JobSrv) extends PublicData with JobRenderer {
+class PublicJob(jobSrv: JobSrv) extends PublicData with JobRenderer with CortexOps {
   override val entityName: String = "job"
   override val initialQuery: Query =
     Query.init[Traversal.V[Job]]("listJob", (graph, authContext) => jobSrv.startTraversal(graph).visible(authContext))

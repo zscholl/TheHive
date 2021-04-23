@@ -25,7 +25,7 @@ class ShareCtrl(
     profileSrv: ProfileSrv,
     db: Database
 ) extends QueryableCtrl
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
   override val entityName: String                 = "share"
   override val publicProperties: PublicProperties = properties.share
   override val initialQuery: Query =

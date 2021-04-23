@@ -51,7 +51,7 @@ class TagSrv(
   def getTag(tag: Tag)(implicit graph: Graph): Traversal.V[Tag] = startTraversal.getTag(tag)
 
   def getFreetag(idOrName: EntityIdOrName)(implicit graph: Graph, authContext: AuthContext): Traversal.V[Tag] =
-    startTraversal.getFreetag(organisationSrv, idOrName)
+    startTraversal.getFreetag(idOrName)
 
   def getOrCreate(tagName: String)(implicit graph: Graph, authContext: AuthContext): Try[Tag with Entity] =
     fromString(tagName)
@@ -108,9 +108,9 @@ class TagSrv(
   }
 }
 
-trait TagOps { _: TheHiveOps =>
+trait TagOpsNoDeps { _: TheHiveOpsNoDeps =>
 
-  implicit class TagOpsDefs(traversal: Traversal.V[Tag]) {
+  implicit class TagOpsNoDepsDefs(traversal: Traversal.V[Tag]) {
 
     def getTag(tag: Tag): Traversal.V[Tag] = getByName(tag.namespace, tag.predicate, tag.value)
 
@@ -144,9 +144,6 @@ trait TagOps { _: TheHiveOps =>
         .has(_.namespace, freeTagNamespace)
     }
 
-    def getFreetag(organisationSrv: OrganisationSrv, idOrName: EntityIdOrName)(implicit authContext: AuthContext): Traversal.V[Tag] =
-      idOrName.fold(traversal.getByIds(_), traversal.has(_.predicate, _)).freetags(organisationSrv)
-
     def autoComplete(organisationSrv: OrganisationSrv, freeTag: String)(implicit authContext: AuthContext): Traversal.V[Tag] =
       freetags(organisationSrv)
         .has(_.predicate, TextP.containing(freeTag))
@@ -169,8 +166,15 @@ trait TagOps { _: TheHiveOps =>
       traversal.project(_.by.by(entityRenderer))
   }
 }
+trait TagOps { _: TheHiveOpsNoDeps =>
+  protected val organisationSrv: OrganisationSrv
+  implicit class TagOpsDefs(traversal: Traversal.V[Tag]) {
+    def getFreetag(idOrName: EntityIdOrName)(implicit authContext: AuthContext): Traversal.V[Tag] =
+      idOrName.fold(traversal.getByIds(_), traversal.has(_.predicate, _)).freetags(organisationSrv)
 
-class TagIntegrityCheckOps(val db: Database, val service: TagSrv) extends IntegrityCheckOps[Tag] with TheHiveOps {
+  }
+}
+class TagIntegrityCheckOps(val db: Database, val service: TagSrv) extends IntegrityCheckOps[Tag] with TheHiveOpsNoDeps {
 
   override def resolve(entities: Seq[Tag with Entity])(implicit graph: Graph): Try[Unit] = {
     firstCreatedEntity(entities).foreach {

@@ -5,13 +5,13 @@ import org.thp.scalligraph.auth.AuthContext
 import org.thp.scalligraph.traversal.Converter.CList
 import org.thp.scalligraph.traversal.{Converter, IdentityConverter, Traversal}
 import org.thp.thehive.models._
-import org.thp.thehive.services.TheHiveOps
+import org.thp.thehive.services.TheHiveOpsNoDeps
 import play.api.libs.json._
 
 import java.lang.{Long => JLong}
 import java.util.{Collection => JCollection, List => JList, Map => JMap}
 
-trait CaseRenderer extends TheHiveOps {
+trait CaseRenderer extends TheHiveOpsNoDeps {
 
   def observableStats: Traversal.V[Share] => Traversal[JsObject, JLong, Converter[JsObject, JLong]] =
     _.observables

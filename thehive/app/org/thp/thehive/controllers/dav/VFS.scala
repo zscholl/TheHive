@@ -4,7 +4,7 @@ import org.thp.scalligraph.auth.AuthContext
 import org.thp.scalligraph.traversal.Graph
 import org.thp.thehive.services._
 
-class VFS(caseSrv: CaseSrv, organisationSrv: OrganisationSrv) extends TheHiveOps {
+class VFS(caseSrv: CaseSrv, val organisationSrv: OrganisationSrv) extends TheHiveOps {
 
   def get(path: List[String])(implicit graph: Graph, authContext: AuthContext): Seq[Resource] =
     path match {
@@ -38,7 +38,7 @@ class VFS(caseSrv: CaseSrv, organisationSrv: OrganisationSrv) extends TheHiveOps
   def list(path: List[String])(implicit graph: Graph, authContext: AuthContext): Seq[Resource] =
     path match {
       case Nil | "" :: Nil       => List(StaticResource("cases"))
-      case "cases" :: Nil        => caseSrv.startTraversal.visible(organisationSrv).toSeq.map(c => EntityResource(c, c.number.toString))
+      case "cases" :: Nil        => caseSrv.startTraversal.visible.toSeq.map(c => EntityResource(c, c.number.toString))
       case "cases" :: cid :: Nil => List(StaticResource("observables"), StaticResource("tasks"))
       case "cases" :: cid :: "observables" :: Nil =>
         caseSrv

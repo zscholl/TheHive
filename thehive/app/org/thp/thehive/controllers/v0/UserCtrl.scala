@@ -27,7 +27,7 @@ class UserCtrl(
     override val queryExecutor: QueryExecutor,
     override val publicData: PublicUser
 ) extends QueryCtrl
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
   def current: Action[AnyContent] =
     entrypoint("current user")
       .authRoTransaction(db) { implicit request => implicit graph =>
@@ -222,7 +222,7 @@ class UserCtrl(
       }
 }
 
-class PublicUser(userSrv: UserSrv, organisationSrv: OrganisationSrv) extends PublicData with TheHiveOps {
+class PublicUser(userSrv: UserSrv, organisationSrv: OrganisationSrv) extends PublicData with TheHiveOpsNoDeps {
   override val entityName: String = "user"
   override val initialQuery: Query =
     Query.init[Traversal.V[User]]("listUser", (graph, authContext) => organisationSrv.get(authContext.organisation)(graph).users)

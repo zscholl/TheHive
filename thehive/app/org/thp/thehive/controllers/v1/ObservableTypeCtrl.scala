@@ -8,7 +8,7 @@ import org.thp.scalligraph.traversal.{IteratorOutput, Traversal}
 import org.thp.thehive.controllers.v1.Conversion._
 import org.thp.thehive.dto.v1.InputObservableType
 import org.thp.thehive.models.{ObservableType, Permissions}
-import org.thp.thehive.services.{ObservableTypeSrv, TheHiveOps}
+import org.thp.thehive.services.{ObservableTypeSrv, TheHiveOpsNoDeps}
 import play.api.mvc.{Action, AnyContent, Results}
 
 class ObservableTypeCtrl(
@@ -16,7 +16,7 @@ class ObservableTypeCtrl(
     db: Database,
     observableTypeSrv: ObservableTypeSrv
 ) extends QueryableCtrl
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
   override val entityName: String = "ObservableType"
   override val initialQuery: Query =
     Query.init[Traversal.V[ObservableType]]("listObservableType", (graph, _) => observableTypeSrv.startTraversal(graph))

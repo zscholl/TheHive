@@ -17,7 +17,7 @@ class AuditCtrl(
     db: Database,
     properties: Properties,
     auditSrv: AuditSrv,
-    organisationSrv: OrganisationSrv,
+    val organisationSrv: OrganisationSrv,
     implicit val schema: Schema
 ) extends QueryableCtrl
     with TheHiveOps {
@@ -25,11 +25,11 @@ class AuditCtrl(
   val entityName: String = "audit"
 
   val initialQuery: Query =
-    Query.init[Traversal.V[Audit]]("listAudit", (graph, authContext) => auditSrv.startTraversal(graph).visible(organisationSrv)(authContext))
+    Query.init[Traversal.V[Audit]]("listAudit", (graph, authContext) => auditSrv.startTraversal(graph).visible(authContext))
   val publicProperties: PublicProperties = properties.audit
   override val getQuery: ParamQuery[EntityIdOrName] = Query.initWithParam[EntityIdOrName, Traversal.V[Audit]](
     "getAudit",
-    (idOrName, graph, authContext) => auditSrv.get(idOrName)(graph).visible(organisationSrv)(authContext)
+    (idOrName, graph, authContext) => auditSrv.get(idOrName)(graph).visible(authContext)
   )
 
   val pageQuery: ParamQuery[OutputParam] =
@@ -44,7 +44,7 @@ class AuditCtrl(
       .authRoTransaction(db) { implicit request => implicit graph =>
         val audits = auditSrv
           .startTraversal
-          .visible(organisationSrv)
+          .visible
           .range(0, 10)
           .richAudit
           .toSeq

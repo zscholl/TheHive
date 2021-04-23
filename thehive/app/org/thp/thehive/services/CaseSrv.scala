@@ -39,7 +39,7 @@ class CaseSrv(
     integrityCheckActor: => ActorRef @@ IntegrityCheckTag,
     cache: SyncCacheApi
 ) extends VertexSrv[Case]
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
   lazy val alertSrv: AlertSrv = _alertSrv
 
   val caseTagSrv              = new EdgeSrv[CaseTag, Case, Tag]
@@ -424,9 +424,9 @@ class CaseSrv(
       .map(_ => ())
 }
 
-trait CaseOps { _: TheHiveOps =>
+trait CaseOpsNoDeps { _: TheHiveOpsNoDeps =>
 
-  implicit class CaseOpsDefs(traversal: Traversal.V[Case]) {
+  implicit class CaseOpsNoDepsDefs(traversal: Traversal.V[Case]) {
 
     def resolutionStatus: Traversal.V[ResolutionStatus] = traversal.out[CaseResolutionStatus].v[ResolutionStatus]
 
@@ -434,9 +434,6 @@ trait CaseOps { _: TheHiveOps =>
       idOrName.fold(traversal.getByIds(_), n => getByNumber(n.toInt))
 
     def getByNumber(caseNumber: Int): Traversal.V[Case] = traversal.has(_.number, caseNumber)
-
-    def visible(organisationSrv: OrganisationSrv)(implicit authContext: AuthContext): Traversal.V[Case] =
-      traversal.has(_.organisationIds, organisationSrv.currentId(traversal.graph, authContext))
 
     def assignee: Traversal.V[User] = traversal.out[CaseUser].v[User]
 
@@ -672,9 +669,20 @@ trait CaseOps { _: TheHiveOps =>
   }
 }
 
+trait CaseOps { _: TheHiveOpsNoDeps =>
+
+  protected val organisationSrv: OrganisationSrv
+
+  implicit class CaseOpsDefs(traversal: Traversal.V[Case]) {
+
+    def visible(implicit authContext: AuthContext): Traversal.V[Case] =
+      traversal.has(_.organisationIds, organisationSrv.currentId(traversal.graph, authContext))
+  }
+}
+
 class CaseIntegrityCheckOps(val db: Database, val service: CaseSrv, userSrv: UserSrv, caseTemplateSrv: CaseTemplateSrv)
     extends IntegrityCheckOps[Case]
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
   def removeDuplicates(): Unit =
     findDuplicates()
       .foreach { entities =>

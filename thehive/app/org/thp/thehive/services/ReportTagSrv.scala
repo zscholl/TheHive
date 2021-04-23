@@ -9,7 +9,7 @@ import org.thp.thehive.models.{Observable, ObservableReportTag, ReportTag}
 
 import scala.util.Try
 
-class ReportTagSrv(observableSrv: ObservableSrv) extends VertexSrv[ReportTag] with TheHiveOps {
+class ReportTagSrv(observableSrv: ObservableSrv) extends VertexSrv[ReportTag] with TheHiveOpsNoDeps {
   val observableReportTagSrv = new EdgeSrv[ObservableReportTag, Observable, ReportTag]
 
   def updateTags(observable: Observable with Entity, origin: String, reportTags: Seq[ReportTag])(implicit
@@ -25,7 +25,7 @@ class ReportTagSrv(observableSrv: ObservableSrv) extends VertexSrv[ReportTag] wi
   }
 }
 
-trait ReportTagOps { _: TheHiveOps =>
+trait ReportTagOps { _: TheHiveOpsNoDeps =>
   implicit class ReportTagOpsDefs(traversal: Traversal.V[ReportTag]) {
     def observable: Traversal.V[Observable] = traversal.in[ObservableReportTag].v[Observable]
 

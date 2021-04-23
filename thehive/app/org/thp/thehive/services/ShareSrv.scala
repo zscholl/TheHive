@@ -19,7 +19,7 @@ class ShareSrv(
     _taskSrv: => TaskSrv,
     _observableSrv: => ObservableSrv
 ) extends VertexSrv[Share]
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
   lazy val caseSrv: CaseSrv             = _caseSrv
   lazy val observableSrv: ObservableSrv = _observableSrv
   lazy val taskSrv: TaskSrv             = _taskSrv
@@ -320,7 +320,7 @@ class ShareSrv(
   }
 }
 
-trait ShareOps { _: TheHiveOps =>
+trait ShareOps { _: TheHiveOpsNoDeps =>
   implicit class ShareOpsDefs(traversal: Traversal.V[Share]) {
     def get(idOrName: EntityIdOrName): Traversal.V[Share] =
       idOrName.fold(traversal.getByIds(_), _ => traversal.empty)

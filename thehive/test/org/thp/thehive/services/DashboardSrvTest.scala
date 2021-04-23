@@ -7,7 +7,7 @@ import org.thp.thehive.models._
 import play.api.libs.json.{JsObject, Json}
 import play.api.test.PlaySpecification
 
-class DashboardSrvTest extends PlaySpecification with TestAppBuilder with TheHiveOps {
+class DashboardSrvTest extends PlaySpecification with TestAppBuilder with TheHiveOpsNoDeps {
   implicit val authContext: AuthContext = DummyUserSrv(userId = "certuser@thehive.local", organisation = "cert").authContext
 
   s" dashboard service" should {

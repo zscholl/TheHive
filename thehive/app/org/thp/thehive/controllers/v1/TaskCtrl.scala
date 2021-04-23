@@ -8,7 +8,7 @@ import org.thp.scalligraph.{EntityIdOrName, _}
 import org.thp.thehive.controllers.v1.Conversion._
 import org.thp.thehive.dto.v1.InputTask
 import org.thp.thehive.models._
-import org.thp.thehive.services.{CaseSrv, OrganisationSrv, TaskSrv}
+import org.thp.thehive.services.{CaseSrv, OrganisationSrv, TaskSrv, TheHiveOps}
 import play.api.mvc.{Action, AnyContent, Results}
 
 import scala.util.Success
@@ -19,9 +19,10 @@ class TaskCtrl(
     properties: Properties,
     taskSrv: TaskSrv,
     caseSrv: CaseSrv,
-    organisationSrv: OrganisationSrv
+    val organisationSrv: OrganisationSrv
 ) extends QueryableCtrl
-    with TaskRenderer {
+    with TaskRenderer
+    with TheHiveOps {
 
   override val entityName: String                 = "task"
   override val publicProperties: PublicProperties = properties.task
@@ -40,7 +41,7 @@ class TaskCtrl(
   )
   override val getQuery: ParamQuery[EntityIdOrName] = Query.initWithParam[EntityIdOrName, Traversal.V[Task]](
     "getTask",
-    (idOrName, graph, authContext) => taskSrv.get(idOrName)(graph).visible(organisationSrv)(authContext)
+    (idOrName, graph, authContext) => taskSrv.get(idOrName)(graph).visible(authContext)
   )
   override val outputQuery: Query =
     Query.outputWithContext[RichTask, Traversal.V[Task]]((taskSteps, _) => taskSteps.richTask)
@@ -57,11 +58,11 @@ class TaskCtrl(
     ),
     Query.init[Traversal.V[Task]](
       "waitingTasks",
-      (graph, authContext) => taskSrv.startTraversal(graph).has(_.status, TaskStatus.Waiting).visible(organisationSrv)(authContext).inCase
+      (graph, authContext) => taskSrv.startTraversal(graph).has(_.status, TaskStatus.Waiting).visible(authContext).inCase
     ),
     Query.init[Traversal.V[Task]]( // DEPRECATED
       "waitingTask",
-      (graph, authContext) => taskSrv.startTraversal(graph).has(_.status, TaskStatus.Waiting).visible(organisationSrv)(authContext).inCase
+      (graph, authContext) => taskSrv.startTraversal(graph).has(_.status, TaskStatus.Waiting).visible(authContext).inCase
     ),
     Query.init[Traversal.V[Task]](
       "myTasks",
@@ -69,7 +70,7 @@ class TaskCtrl(
         taskSrv
           .startTraversal(graph)
           .assignTo(authContext.userId)
-          .visible(organisationSrv)(authContext)
+          .visible(authContext)
           .inCase
     ),
     Query[Traversal.V[Task], Traversal.V[User]]("assignableUsers", (taskSteps, authContext) => taskSteps.assignableUsers(authContext)),
@@ -98,7 +99,7 @@ class TaskCtrl(
       .authRoTransaction(db) { implicit request => implicit graph =>
         taskSrv
           .get(EntityIdOrName(taskId))
-          .visible(organisationSrv)
+          .visible
           .richTask
           .getOrFail("Task")
           .map(task => Results.Ok(task.toJson))
@@ -109,7 +110,7 @@ class TaskCtrl(
       .authRoTransaction(db) { implicit request => implicit graph =>
         val tasks = taskSrv
           .startTraversal
-          .visible(organisationSrv)
+          .visible
           .richTask
           .toSeq
         Success(Results.Ok(tasks.toJson))
@@ -151,7 +152,7 @@ class TaskCtrl(
   def isActionRequired(taskId: String): Action[AnyContent] =
     entrypoint("is action required")
       .authTransaction(db) { implicit request => implicit graph =>
-        val actionTraversal = taskSrv.get(EntityIdOrName(taskId)).visible(organisationSrv).actionRequiredMap
+        val actionTraversal = taskSrv.get(EntityIdOrName(taskId)).visible.actionRequiredMap
         Success(Results.Ok(actionTraversal.toSeq.toMap.toJson))
       }
 
@@ -160,7 +161,7 @@ class TaskCtrl(
       .authTransaction(db) { implicit request => implicit graph =>
         for {
           organisation <- organisationSrv.get(EntityIdOrName(orgaId)).visible.getOrFail("Organisation")
-          task         <- taskSrv.get(EntityIdOrName(taskId)).visible(organisationSrv).getOrFail("Task")
+          task         <- taskSrv.get(EntityIdOrName(taskId)).visible.getOrFail("Task")
           _            <- taskSrv.actionRequired(task, organisation, required)
         } yield Results.NoContent
       }

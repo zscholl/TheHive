@@ -23,7 +23,7 @@ class CustomFieldSrv(
     integrityCheckActor: => ActorRef @@ IntegrityCheckTag,
     cacheApi: SyncCacheApi
 ) extends VertexSrv[CustomField]
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
 
   override def createEntity(e: CustomField)(implicit graph: Graph, authContext: AuthContext): Try[CustomField with Entity] = {
     integrityCheckActor ! EntityAdded("CustomField")
@@ -76,7 +76,7 @@ class CustomFieldSrv(
     startTraversal.getByName(name)
 }
 
-trait CustomFieldOps { _: TheHiveOps =>
+trait CustomFieldOps { _: TheHiveOpsNoDeps =>
 
   implicit class CustomFieldOpsDefs(traversal: Traversal.V[CustomField]) {
     def get(idOrName: EntityIdOrName): Traversal.V[CustomField] =

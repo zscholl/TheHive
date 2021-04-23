@@ -18,7 +18,7 @@ class OrganisationCtrl(
     userSrv: UserSrv,
     implicit val db: Database
 ) extends QueryableCtrl
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
 
   override val entityName: String                 = "organisation"
   override val publicProperties: PublicProperties = properties.organisation

@@ -35,7 +35,7 @@ case object Commit            extends StreamMessage
   * to global stream actor.
   */
 class StreamActor(
-    organisationSrv: OrganisationSrv,
+    val organisationSrv: OrganisationSrv,
     authContext: AuthContext,
     refresh: FiniteDuration,
     maxWait: FiniteDuration,
@@ -70,7 +70,7 @@ class StreamActor(
       db.roTransaction { implicit graph =>
         val visibleIds = auditSrv
           .getByIds(ids: _*)
-          .visible(organisationSrv)(authContext)
+          .visible(authContext)
           .toSeq
           .map(_._id)
         logger.debug(s"[$self] AuditStreamMessage $ids => $visibleIds")
@@ -110,7 +110,7 @@ class StreamActor(
       db.roTransaction { implicit graph =>
         val visibleIds = auditSrv
           .getByIds(ids: _*)
-          .visible(organisationSrv)(authContext)
+          .visible(authContext)
           .toSeq
           .map(_._id)
         logger.debug(s"[$self] AuditStreamMessage $ids => $visibleIds")

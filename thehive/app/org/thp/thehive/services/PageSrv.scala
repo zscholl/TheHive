@@ -10,7 +10,7 @@ import play.api.libs.json.Json
 
 import scala.util.Try
 
-class PageSrv(organisationSrv: OrganisationSrv, auditSrv: AuditSrv) extends VertexSrv[Page] with TheHiveOps {
+class PageSrv(organisationSrv: OrganisationSrv, auditSrv: AuditSrv) extends VertexSrv[Page] with TheHiveOpsNoDeps {
 
   val organisationPageSrv = new EdgeSrv[OrganisationPage, Organisation, Page]
 
@@ -38,7 +38,7 @@ class PageSrv(organisationSrv: OrganisationSrv, auditSrv: AuditSrv) extends Vert
     }
 }
 
-trait PageOps { _: TheHiveOps =>
+trait PageOps { _: TheHiveOpsNoDeps =>
 
   implicit class PageOpsDefs(traversal: Traversal.V[Page]) {
 
@@ -51,5 +51,4 @@ trait PageOps { _: TheHiveOps =>
     def visible(implicit authContext: AuthContext): Traversal.V[Page] =
       traversal.filter(_.organisation.current)
   }
-
 }

@@ -36,7 +36,7 @@ class MispImportSrv(
     attributeConvertersConfig: ConfigItem[Seq[AttributeConverter], Seq[AttributeConverter]],
     implicit val ec: ExecutionContext,
     implicit val mat: Materializer
-) extends TheHiveOps {
+) extends TheHiveOpsNoDeps {
 
   lazy val logger: Logger = Logger(getClass)
 

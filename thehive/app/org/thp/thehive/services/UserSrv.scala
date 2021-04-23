@@ -28,7 +28,7 @@ class UserSrv(
     attachmentSrv: AttachmentSrv,
     integrityCheckActor: => ActorRef @@ IntegrityCheckTag
 ) extends VertexSrv[User]
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
   val defaultUserDomain: Option[String] = configuration.getOptional[String]("auth.defaultUserDomain")
   val fullUserNameRegex: Pattern        = "[\\p{Graph}&&[^@.]](?:[\\p{Graph}&&[^@]]*)*@\\p{Alnum}+(?:[\\p{Alnum}-.])*".r.pattern
 
@@ -149,7 +149,7 @@ class UserSrv(
     } yield ()
 }
 
-trait UserOps { _: TheHiveOps =>
+trait UserOps { _: TheHiveOpsNoDeps =>
 
   implicit class UserOpsDefs(traversal: Traversal.V[User]) {
     def get(idOrName: EntityIdOrName): Traversal.V[User] =
@@ -310,7 +310,7 @@ class UserIntegrityCheckOps(
     organisationSrv: OrganisationSrv,
     roleSrv: RoleSrv
 ) extends IntegrityCheckOps[User]
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
 
   override def initialCheck()(implicit graph: Graph, authContext: AuthContext): Unit = {
     super.initialCheck()

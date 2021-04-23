@@ -70,7 +70,7 @@ class Webhook(
     mat: Materializer,
     implicit val ec: ExecutionContext
 ) extends Notifier
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
   override val name: String = "webhook"
 
   lazy val logger: Logger = Logger(getClass)

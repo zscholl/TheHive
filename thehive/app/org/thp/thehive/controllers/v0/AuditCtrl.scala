@@ -28,7 +28,7 @@ class AuditCtrl(
     override val queryExecutor: QueryExecutor
 ) extends AuditRenderer
     with QueryCtrl
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
   implicit val timeout: Timeout = Timeout(5.minutes)
 
   def flow(caseId: Option[String]): Action[AnyContent] =
@@ -61,16 +61,16 @@ class AuditCtrl(
       }
 }
 
-class PublicAudit(auditSrv: AuditSrv, organisationSrv: OrganisationSrv, db: Database) extends PublicData with TheHiveOps {
+class PublicAudit(auditSrv: AuditSrv, val organisationSrv: OrganisationSrv, db: Database) extends PublicData with TheHiveOps {
   override val getQuery: ParamQuery[EntityIdOrName] = Query.initWithParam[EntityIdOrName, Traversal.V[Audit]](
     "getAudit",
-    (idOrName, graph, authContext) => auditSrv.get(idOrName)(graph).visible(organisationSrv)(authContext)
+    (idOrName, graph, authContext) => auditSrv.get(idOrName)(graph).visible(authContext)
   )
 
   override val entityName: String = "audit"
 
   override val initialQuery: Query =
-    Query.init[Traversal.V[Audit]]("listAudit", (graph, authContext) => auditSrv.startTraversal(graph).visible(organisationSrv)(authContext))
+    Query.init[Traversal.V[Audit]]("listAudit", (graph, authContext) => auditSrv.startTraversal(graph).visible(authContext))
 
   override val pageQuery: ParamQuery[org.thp.thehive.controllers.v0.OutputParam] =
     Query.withParam[OutputParam, Traversal.V[Audit], IteratorOutput](

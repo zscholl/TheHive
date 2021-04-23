@@ -8,7 +8,7 @@ import org.thp.scalligraph.{EntityIdOrName, InvalidFormatAttributeError}
 import org.thp.thehive.controllers.v0.Conversion._
 import org.thp.thehive.dto.v0.InputDashboard
 import org.thp.thehive.models.{Dashboard, RichDashboard}
-import org.thp.thehive.services.{DashboardSrv, OrganisationSrv, TheHiveOps, UserSrv}
+import org.thp.thehive.services.{DashboardSrv, OrganisationSrv, TheHiveOpsNoDeps, UserSrv}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Results}
 
@@ -21,7 +21,7 @@ class DashboardCtrl(
     override val publicData: PublicDashboard,
     override val queryExecutor: QueryExecutor
 ) extends QueryCtrl
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
   def create: Action[AnyContent] =
     entrypoint("create dashboard")
       .extract("dashboard", FieldsParser[InputDashboard])
@@ -80,7 +80,7 @@ class PublicDashboard(
     organisationSrv: OrganisationSrv,
     userSrv: UserSrv
 ) extends PublicData
-    with TheHiveOps {
+    with TheHiveOpsNoDeps {
   val entityName: String = "dashboard"
 
   val initialQuery: Query =

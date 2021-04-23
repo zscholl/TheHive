@@ -14,7 +14,7 @@ import scala.util.{Success, Try}
 class PatternSrv(
     auditSrv: AuditSrv,
     caseSrv: CaseSrv,
-    organisationSrv: OrganisationSrv
+    val organisationSrv: OrganisationSrv
 ) extends VertexSrv[Pattern]
     with TheHiveOps {
   val patternPatternSrv = new EdgeSrv[PatternPattern, Pattern, Pattern]
@@ -31,7 +31,7 @@ class PatternSrv(
 
   def getCasePatterns(caseId: String)(implicit authContext: AuthContext, graph: Graph): Try[Seq[RichPattern]] =
     for {
-      caze <- caseSrv.get(EntityIdOrName(caseId)).visible(organisationSrv).getOrFail("Case")
+      caze <- caseSrv.get(EntityIdOrName(caseId)).visible.getOrFail("Case")
     } yield caseSrv.get(caze).procedure.pattern.richPattern.toSeq
 
   def update(
@@ -68,7 +68,7 @@ class PatternSrv(
 
 }
 
-trait PatternOps { _: TheHiveOps =>
+trait PatternOps { _: TheHiveOpsNoDeps =>
   implicit class PatternOpsDefs(traversal: Traversal.V[Pattern]) {
 
     def getByPatternId(patternId: String): Traversal.V[Pattern] = traversal.has(_.patternId, patternId)

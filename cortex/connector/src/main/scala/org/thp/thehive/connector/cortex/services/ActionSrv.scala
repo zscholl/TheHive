@@ -30,13 +30,13 @@ class ActionSrv(
     serviceHelper: ServiceHelper,
     logSrv: LogSrv,
     clientsConfig: ConfigItem[Seq[CortexClientConfig], Seq[CortexClient]],
+    val organisationSrv: OrganisationSrv,
     implicit val schema: Schema,
     implicit val db: Database,
     implicit val ec: ExecutionContext,
     auditSrv: CortexAuditSrv
 ) extends VertexSrv[Action]
-    with TheHiveOps
-    with CortexOps {
+    with ActionOps {
 
   lazy val cortexActor: ActorRef @@ CortexTag = _cortexActor
   val actionContextSrv                        = new EdgeSrv[ActionContext, Action, Product]
@@ -201,9 +201,10 @@ class ActionSrv(
   def listForEntity(id: EntityId)(implicit graph: Graph): Seq[RichAction] = startTraversal.forEntity(id).richAction.toSeq
 }
 
-trait ActionOps { _: CortexOps =>
+trait ActionOpsNoDeps {
+  _: CortexOps =>
 
-  implicit class ActionOpsDefs(traversal: Traversal.V[Action]) {
+  implicit class ActionOpsNoDepsDefs(traversal: Traversal.V[Action]) {
 
     /**
       * Provides a RichAction model with additional Entity context
@@ -225,17 +226,22 @@ trait ActionOps { _: CortexOps =>
       traversal.filter(_.out[ActionContext].hasId(entityId))
 
     def context: Traversal[Product with Entity, Element, Converter[Product with Entity, Element]] = traversal.out[ActionContext].entity
+  }
+}
 
-    def visible(organisationSrv: OrganisationSrv)(implicit authContext: AuthContext): Traversal.V[Action] =
+trait ActionOps extends CortexOps with TheHiveOps {
+
+  implicit class ActionOpsDefs(traversal: Traversal.V[Action]) {
+    def visible(implicit authContext: AuthContext): Traversal.V[Action] =
       traversal.filter(
         _.out[ActionContext]
           .chooseBranch[String, Any](
             _.on(_.label)
-              .option("Case", _.v[Case].visible(organisationSrv).widen[Any])
-              .option("Task", _.v[Task].visible(organisationSrv).widen[Any])
-              .option("Log", _.v[Log].visible(organisationSrv).widen[Any])
-              .option("Alert", _.v[Alert].visible(organisationSrv).widen[Any])
-              .option("Observable", _.v[Observable].visible(organisationSrv).widen[Any])
+              .option("Case", _.v[Case].visible.widen[Any])
+              .option("Task", _.v[Task].visible.widen[Any])
+              .option("Log", _.v[Log].visible.widen[Any])
+              .option("Alert", _.v[Alert].visible.widen[Any])
+              .option("Observable", _.v[Observable].visible.widen[Any])
           )
       )
   }

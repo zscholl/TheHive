@@ -25,7 +25,7 @@ class UserCtrl(
     caseSrv: CaseSrv,
     userSrv: UserSrv,
     authSrv: AuthSrv,
-    organisationSrv: OrganisationSrv,
+    val organisationSrv: OrganisationSrv,
     profileSrv: ProfileSrv,
     auditSrv: AuditSrv,
     attachmentSrv: AttachmentSrv,
@@ -57,11 +57,10 @@ class UserCtrl(
 
   override val extraQueries: Seq[ParamQuery[_]] = Seq(
     Query.init[Traversal.V[User]]("currentUser", (graph, authContext) => userSrv.current(graph, authContext)),
-    Query[Traversal.V[User], Traversal.V[Task]]("tasks", (userSteps, authContext) => userSteps.tasks.visible(organisationSrv)(authContext)),
+    Query[Traversal.V[User], Traversal.V[Task]]("tasks", (userSteps, authContext) => userSteps.tasks.visible(authContext)),
     Query[Traversal.V[User], Traversal.V[Case]](
       "cases",
-      (userSteps, authContext) =>
-        caseSrv.startTraversal(userSteps.graph).visible(organisationSrv)(authContext).assignedTo(userSteps.value(_.login).toSeq: _*)
+      (userSteps, authContext) => caseSrv.startTraversal(userSteps.graph).visible(authContext).assignedTo(userSteps.value(_.login).toSeq: _*)
     )
   )
   def current: Action[AnyContent] =

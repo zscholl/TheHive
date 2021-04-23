@@ -53,7 +53,7 @@ class DatabaseBuilder(
     taxonomySrv: TaxonomySrv,
     userSrv: UserSrv,
     integrityChecks: Seq[GenIntegrityCheckOps]
-) extends TheHiveOps {
+) extends TheHiveOpsNoDeps {
 
   lazy val logger: Logger = Logger(getClass)
 

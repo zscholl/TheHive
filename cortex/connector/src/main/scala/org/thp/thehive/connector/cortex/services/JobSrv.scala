@@ -281,7 +281,7 @@ class JobSrv(
 
 }
 
-trait JobOps extends TheHiveOps { _: CortexOps =>
+trait JobOps extends TheHiveOpsNoDeps { _: CortexOps =>
 
   implicit class JobOpsDefs(traversal: Traversal.V[Job]) {
 

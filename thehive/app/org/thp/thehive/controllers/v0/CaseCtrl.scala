@@ -21,12 +21,13 @@ class CaseCtrl(
     caseSrv: CaseSrv,
     caseTemplateSrv: CaseTemplateSrv,
     userSrv: UserSrv,
-    organisationSrv: OrganisationSrv,
+    val organisationSrv: OrganisationSrv,
     override val publicData: PublicCase,
     override val queryExecutor: QueryExecutor,
     implicit override val db: Database
 ) extends CaseRenderer
-    with QueryCtrl {
+    with QueryCtrl
+    with TheHiveOps {
   def create: Action[AnyContent] =
     entrypoint("create case")
       .extract("case", FieldsParser[InputCase])
@@ -63,7 +64,7 @@ class CaseCtrl(
       .authRoTransaction(db) { implicit request => implicit graph =>
         val c = caseSrv
           .get(EntityIdOrName(caseIdOrNumber))
-          .visible(organisationSrv)
+          .visible
         val stats: Option[Boolean] = request.body("stats")
         if (stats.contains(true))
           c.richCaseWithCustomRenderer(caseStatsRenderer(request))
@@ -138,8 +139,8 @@ class CaseCtrl(
     entrypoint("merge cases")
       .authTransaction(db) { implicit request => implicit graph =>
         for {
-          caze    <- caseSrv.get(EntityIdOrName(caseId)).visible(organisationSrv).getOrFail("Case")
-          toMerge <- caseSrv.get(EntityIdOrName(caseToMerge)).visible(organisationSrv).getOrFail("Case")
+          caze    <- caseSrv.get(EntityIdOrName(caseId)).visible.getOrFail("Case")
+          toMerge <- caseSrv.get(EntityIdOrName(caseToMerge)).visible.getOrFail("Case")
           merged  <- caseSrv.merge(Seq(caze, toMerge))
         } yield Results.Created(merged.toJson)
       }
@@ -149,7 +150,7 @@ class CaseCtrl(
       .authRoTransaction(db) { implicit request => implicit graph =>
         val relatedCases = caseSrv
           .get(EntityIdOrName(caseIdOrNumber))
-          .visible(organisationSrv)
+          .visible
           .linkedCases
           .map {
             case (c, o) =>
@@ -164,20 +165,21 @@ class CaseCtrl(
 
 class PublicCase(
     caseSrv: CaseSrv,
-    organisationSrv: OrganisationSrv,
+    val organisationSrv: OrganisationSrv,
     observableSrv: ObservableSrv,
     userSrv: UserSrv,
     customFieldSrv: CustomFieldSrv,
     implicit val db: Database
 ) extends PublicData
-    with CaseRenderer {
+    with CaseRenderer
+    with TheHiveOps {
   override val entityName: String = "case"
   override val initialQuery: Query =
-    Query.init[Traversal.V[Case]]("listCase", (graph, authContext) => caseSrv.startTraversal(graph).visible(organisationSrv)(authContext))
+    Query.init[Traversal.V[Case]]("listCase", (graph, authContext) => caseSrv.startTraversal(graph).visible(authContext))
   override val getQuery: ParamQuery[EntityIdOrName] =
     Query.initWithParam[EntityIdOrName, Traversal.V[Case]](
       "getCase",
-      (idOrName, graph, authContext) => caseSrv.get(idOrName)(graph).visible(organisationSrv)(authContext)
+      (idOrName, graph, authContext) => caseSrv.get(idOrName)(graph).visible(authContext)
     )
   override val pageQuery: ParamQuery[OutputParam] =
     Query.withParam[OutputParam, Traversal.V[Case], IteratorOutput](
@@ -199,16 +201,16 @@ class PublicCase(
       "observables",
       (caseSteps, authContext) =>
         // caseSteps.observables(authContext)
-        observableSrv.startTraversal(caseSteps.graph).has(_.relatedId, P.within(caseSteps._id.toSeq: _*)).visible(organisationSrv)(authContext)
+        observableSrv.startTraversal(caseSteps.graph).has(_.relatedId, P.within(caseSteps._id.toSeq: _*)).visible(authContext)
     ),
     Query[Traversal.V[Case], Traversal.V[Task]](
       "tasks",
       (caseSteps, authContext) => caseSteps.tasks(authContext)
-//        taskSrv.startTraversal(caseSteps.graph).has(_.relatedId, P.within(caseSteps._id.toSeq: _*)).visible(organisationSrv)(authContext)
+//        taskSrv.startTraversal(caseSteps.graph).has(_.relatedId, P.within(caseSteps._id.toSeq: _*)).visible(authContext)
     ),
     Query[Traversal.V[Case], Traversal.V[User]]("assignableUsers", (caseSteps, authContext) => caseSteps.assignableUsers(authContext)),
     Query[Traversal.V[Case], Traversal.V[Organisation]]("organisations", (caseSteps, authContext) => caseSteps.organisations.visible(authContext)),
-    Query[Traversal.V[Case], Traversal.V[Alert]]("alerts", (caseSteps, authContext) => caseSteps.alert.visible(organisationSrv)(authContext))
+    Query[Traversal.V[Case], Traversal.V[Alert]]("alerts", (caseSteps, authContext) => caseSteps.alert.visible(authContext))
   )
   override val publicProperties: PublicProperties =
     PublicPropertyListBuilder[Case]
