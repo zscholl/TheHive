@@ -5,13 +5,11 @@ import org.thp.scalligraph.auth.AuthContext
 import org.thp.scalligraph.controllers.{Entrypoint, FieldsParser}
 import org.thp.scalligraph.models.{Database, Entity, UMapping}
 import org.thp.scalligraph.query._
-import org.thp.scalligraph.traversal.TraversalOps._
 import org.thp.scalligraph.traversal.{IteratorOutput, Traversal}
 import org.thp.thehive.connector.cortex.controllers.v0.Conversion._
 import org.thp.thehive.connector.cortex.dto.v0.InputAction
 import org.thp.thehive.connector.cortex.models.{Action, ActionContext, RichAction}
-import org.thp.thehive.connector.cortex.services.ActionOps._
-import org.thp.thehive.connector.cortex.services.{ActionSrv, EntityHelper}
+import org.thp.thehive.connector.cortex.services.{ActionSrv, CortexOps, EntityHelper}
 import org.thp.thehive.controllers.v0.Conversion.{toObjectType, _}
 import org.thp.thehive.controllers.v0._
 import org.thp.thehive.models._
@@ -73,7 +71,7 @@ class ActionCtrl(
       }
 }
 
-class PublicAction(actionSrv: ActionSrv, organisationSrv: OrganisationSrv, db: Database) extends PublicData {
+class PublicAction(actionSrv: ActionSrv, organisationSrv: OrganisationSrv, db: Database) extends PublicData with TheHiveOps with CortexOps {
 
   override val entityName: String = "action"
   override val initialQuery: Query =

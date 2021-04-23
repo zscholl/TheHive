@@ -7,12 +7,10 @@ import org.thp.scalligraph.auth.AuthContext
 import org.thp.scalligraph.models.{Database, Entity}
 import org.thp.scalligraph.query.PropertyUpdater
 import org.thp.scalligraph.services.{IntegrityCheckOps, VertexSrv}
-import org.thp.scalligraph.traversal.TraversalOps._
 import org.thp.scalligraph.traversal._
 import org.thp.scalligraph.{EntityIdOrName, RichSeq}
 import org.thp.thehive.controllers.v1.Conversion._
 import org.thp.thehive.models._
-import org.thp.thehive.services.CustomFieldOps._
 import play.api.cache.SyncCacheApi
 import play.api.libs.json.{JsObject, JsValue}
 
@@ -24,7 +22,8 @@ class CustomFieldSrv(
     organisationSrv: OrganisationSrv,
     integrityCheckActor: => ActorRef @@ IntegrityCheckTag,
     cacheApi: SyncCacheApi
-) extends VertexSrv[CustomField] {
+) extends VertexSrv[CustomField]
+    with TheHiveOps {
 
   override def createEntity(e: CustomField)(implicit graph: Graph, authContext: AuthContext): Try[CustomField with Entity] = {
     integrityCheckActor ! EntityAdded("CustomField")
@@ -77,7 +76,7 @@ class CustomFieldSrv(
     startTraversal.getByName(name)
 }
 
-object CustomFieldOps {
+trait CustomFieldOps { _: TheHiveOps =>
 
   implicit class CustomFieldOpsDefs(traversal: Traversal.V[CustomField]) {
     def get(idOrName: EntityIdOrName): Traversal.V[CustomField] =

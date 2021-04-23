@@ -7,16 +7,10 @@ import org.thp.scalligraph.auth.AuthContext
 import org.thp.scalligraph.controllers._
 import org.thp.scalligraph.models.{Database, Entity, UMapping}
 import org.thp.scalligraph.query._
-import org.thp.scalligraph.traversal.TraversalOps._
 import org.thp.scalligraph.traversal.{IteratorOutput, Traversal}
 import org.thp.thehive.controllers.v0.Conversion._
 import org.thp.thehive.dto.v0.{InputAttachment, InputObservable}
 import org.thp.thehive.models._
-import org.thp.thehive.services.AlertOps._
-import org.thp.thehive.services.CaseOps._
-import org.thp.thehive.services.ObservableOps._
-import org.thp.thehive.services.OrganisationOps._
-import org.thp.thehive.services.ShareOps._
 import org.thp.thehive.services._
 import play.api.Configuration
 import play.api.libs.Files.TemporaryFileCreator
@@ -44,7 +38,8 @@ class ObservableCtrl(
     override val publicData: PublicObservable,
     temporaryFileCreator: TemporaryFileCreator
 ) extends ObservableRenderer
-    with QueryCtrl {
+    with QueryCtrl
+    with TheHiveOps {
 
   type AnyAttachmentType = InputAttachment :+: FFile :+: String :+: CNil
 
@@ -355,7 +350,8 @@ class PublicObservable(
     observableSrv: ObservableSrv,
     organisationSrv: OrganisationSrv
 ) extends PublicData
-    with ObservableRenderer {
+    with ObservableRenderer
+    with TheHiveOps {
   override val entityName: String = "observable"
   override val initialQuery: Query =
     Query.init[Traversal.V[Observable]](

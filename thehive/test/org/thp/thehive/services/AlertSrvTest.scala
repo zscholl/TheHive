@@ -2,21 +2,15 @@ package org.thp.thehive.services
 
 import org.thp.scalligraph.auth.AuthContext
 import org.thp.scalligraph.models._
-import org.thp.scalligraph.traversal.TraversalOps._
 import org.thp.scalligraph.{EntityId, EntityIdOrName, EntityName}
-
 import org.thp.thehive.dto.v1.InputCustomFieldValue
 import org.thp.thehive.models._
-import org.thp.thehive.services.AlertOps._
-import org.thp.thehive.services.CaseOps._
-import org.thp.thehive.services.ObservableOps._
-import org.thp.thehive.services.OrganisationOps._
 import play.api.libs.json.JsString
 import play.api.test.PlaySpecification
 
 import java.util.Date
 
-class AlertSrvTest extends PlaySpecification with TestAppBuilder {
+class AlertSrvTest extends PlaySpecification with TestAppBuilder with TheHiveOps {
   implicit val authContext: AuthContext = DummyUserSrv(userId = "certuser@thehive.local", organisation = "cert").authContext
 
   "alert service" should {

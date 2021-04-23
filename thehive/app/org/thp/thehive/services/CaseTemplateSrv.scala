@@ -5,19 +5,12 @@ import com.softwaremill.tagging.@@
 import org.apache.tinkerpop.gremlin.process.traversal.P
 import org.thp.scalligraph.auth.{AuthContext, Permission}
 import org.thp.scalligraph.models.{Database, Entity}
-import org.thp.scalligraph.query.PredicateOps.PredicateOpsDefs
 import org.thp.scalligraph.query.PropertyUpdater
 import org.thp.scalligraph.services._
-import org.thp.scalligraph.traversal.TraversalOps._
 import org.thp.scalligraph.traversal.{Converter, Graph, StepLabel, Traversal}
 import org.thp.scalligraph.{CreateError, EntityIdOrName, EntityName, RichSeq}
 import org.thp.thehive.controllers.v1.Conversion._
 import org.thp.thehive.models._
-import org.thp.thehive.services.CaseTemplateOps._
-import org.thp.thehive.services.CustomFieldOps._
-import org.thp.thehive.services.OrganisationOps._
-import org.thp.thehive.services.TaskOps._
-import org.thp.thehive.services.UserOps._
 import play.api.libs.json.{JsObject, JsValue, Json}
 
 import java.util.{Date, Map => JMap}
@@ -30,7 +23,8 @@ class CaseTemplateSrv(
     taskSrv: TaskSrv,
     auditSrv: AuditSrv,
     integrityCheckActor: => ActorRef @@ IntegrityCheckTag
-) extends VertexSrv[CaseTemplate] {
+) extends VertexSrv[CaseTemplate]
+    with TheHiveOps {
 
   val caseTemplateTagSrv          = new EdgeSrv[CaseTemplateTag, CaseTemplate, Tag]
   val caseTemplateCustomFieldSrv  = new EdgeSrv[CaseTemplateCustomField, CaseTemplate, CustomField]
@@ -148,7 +142,7 @@ class CaseTemplateSrv(
     } yield RichCustomField(cf, ccfe)
 }
 
-object CaseTemplateOps {
+trait CaseTemplateOps { _: TheHiveOps =>
   implicit class CaseTemplateOpsDefs(traversal: Traversal.V[CaseTemplate]) {
 
     def get(idOrName: EntityIdOrName): Traversal.V[CaseTemplate] =
@@ -273,7 +267,8 @@ class CaseTemplateIntegrityCheckOps(
     val db: Database,
     val service: CaseTemplateSrv,
     organisationSrv: OrganisationSrv
-) extends IntegrityCheckOps[CaseTemplate] {
+) extends IntegrityCheckOps[CaseTemplate]
+    with TheHiveOps {
   override def findDuplicates: Seq[Seq[CaseTemplate with Entity]] =
     db.roTransaction { implicit graph =>
       organisationSrv

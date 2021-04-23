@@ -1,23 +1,19 @@
 package org.thp.thehive.connector.cortex.services
 
 import org.thp.cortex.dto.v0.OutputJob
+import org.thp.scalligraph.EntityName
 import org.thp.scalligraph.auth.AuthContext
 import org.thp.scalligraph.models._
-import org.thp.scalligraph.traversal.TraversalOps._
-import org.thp.scalligraph.EntityName
 import org.thp.thehive.connector.cortex.TestAppBuilder
-import org.thp.thehive.connector.cortex.controllers.v0.ActionCtrl
 import org.thp.thehive.connector.cortex.models.JobStatus
 import org.thp.thehive.models._
-import org.thp.thehive.services.AlertOps._
-import org.thp.thehive.services.TaskOps._
-import org.thp.thehive.services.{AlertSrv, LogSrv, OrganisationSrv, TaskSrv}
+import org.thp.thehive.services.TheHiveOps
 import play.api.libs.json._
 import play.api.test.PlaySpecification
 
 import scala.io.Source
 
-class ActionSrvTest extends PlaySpecification with TestAppBuilder {
+class ActionSrvTest extends PlaySpecification with TestAppBuilder with TheHiveOps {
   implicit val authContext: AuthContext =
     DummyUserSrv(userId = "certuser@thehive.local", organisation = "cert", permissions = Permissions.all).authContext
 
@@ -26,8 +22,8 @@ class ActionSrvTest extends PlaySpecification with TestAppBuilder {
   "action service" should {
     "execute, create and handle finished action operations" in testApp { app =>
       import app._
-      import app.thehiveModule._
       import app.cortexConnector._
+      import app.thehiveModule._
 
       database.roTransaction { implicit graph =>
         implicit val entityWrites: OWrites[Entity] = actionCtrl.entityWrites
@@ -56,8 +52,8 @@ class ActionSrvTest extends PlaySpecification with TestAppBuilder {
 
     "handle action related to Task and Log" in testApp { app =>
       import app._
-      import app.thehiveModule._
       import app.cortexConnector._
+      import app.thehiveModule._
 
       database.roTransaction { implicit graph =>
         implicit val entityWrites: OWrites[Entity] = actionCtrl.entityWrites
@@ -92,8 +88,8 @@ class ActionSrvTest extends PlaySpecification with TestAppBuilder {
 
     "handle action related to an Alert" in testApp { app =>
       import app._
-      import app.thehiveModule._
       import app.cortexConnector._
+      import app.thehiveModule._
 
       implicit val entityWrites: OWrites[Entity] = actionCtrl.entityWrites
       val alert = database.roTransaction { implicit graph =>

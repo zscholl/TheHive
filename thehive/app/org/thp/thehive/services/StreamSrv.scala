@@ -9,10 +9,8 @@ import org.thp.scalligraph.models.Database
 import org.thp.scalligraph.services.EventSrv
 import org.thp.scalligraph.services.config.ApplicationConfig.finiteDurationFormat
 import org.thp.scalligraph.services.config.{ApplicationConfig, ConfigItem}
-import org.thp.scalligraph.traversal.TraversalOps._
 import org.thp.scalligraph.utils.Retry
 import org.thp.scalligraph.{EntityId, NotFoundError}
-import org.thp.thehive.services.AuditOps._
 import play.api.Logger
 import play.api.libs.json.Json
 
@@ -45,7 +43,8 @@ class StreamActor(
     keepAlive: FiniteDuration,
     auditSrv: AuditSrv,
     db: Database
-) extends Actor {
+) extends Actor
+    with TheHiveOps {
   import context.dispatcher
 
   lazy val logger: Logger = Logger(getClass)

@@ -3,13 +3,12 @@ package org.thp.thehive.connector.cortex.services
 import org.thp.scalligraph.EntityName
 import org.thp.scalligraph.auth.AuthContext
 import org.thp.scalligraph.models.DummyUserSrv
-import org.thp.scalligraph.traversal.TraversalOps._
 import org.thp.thehive.connector.cortex.TestAppBuilder
 import org.thp.thehive.models.Permissions
-import org.thp.thehive.services.AlertOps._
+import org.thp.thehive.services.TheHiveOps
 import play.api.test.PlaySpecification
 
-class EntityHelperTest extends PlaySpecification with TestAppBuilder {
+class EntityHelperTest extends PlaySpecification with TestAppBuilder with TheHiveOps {
   implicit val authContext: AuthContext =
     DummyUserSrv(userId = "certadmin@thehive.local", organisation = "cert", permissions = Permissions.all).authContext
   "entity helper" should {

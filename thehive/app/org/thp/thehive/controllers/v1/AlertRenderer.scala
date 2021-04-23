@@ -1,11 +1,9 @@
 package org.thp.thehive.controllers.v1
 
 import org.thp.scalligraph.auth.AuthContext
-import org.thp.scalligraph.traversal.TraversalOps._
 import org.thp.scalligraph.traversal.{Converter, Traversal}
 import org.thp.thehive.controllers.v1.Conversion._
 import org.thp.thehive.models.{Alert, RichCase, SimilarStats}
-import org.thp.thehive.services.AlertOps._
 import org.thp.thehive.services.OrganisationSrv
 import play.api.libs.json._
 

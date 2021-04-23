@@ -9,21 +9,14 @@ import org.thp.scalligraph.auth.AuthContext
 import org.thp.scalligraph.models._
 import org.thp.scalligraph.services._
 import org.thp.scalligraph.services.config.ConfigItem
-import org.thp.scalligraph.traversal.TraversalOps._
 import org.thp.scalligraph.traversal.{Converter, Graph, Traversal}
 import org.thp.scalligraph.{EntityId, NotFoundError}
 import org.thp.thehive.connector.cortex.controllers.v0.Conversion._
 import org.thp.thehive.connector.cortex.models._
-import org.thp.thehive.connector.cortex.services.ActionOps._
 import org.thp.thehive.connector.cortex.services.Conversion._
 import org.thp.thehive.controllers.v0.Conversion._
 import org.thp.thehive.models._
-import org.thp.thehive.services.AlertOps._
-import org.thp.thehive.services.CaseOps._
-import org.thp.thehive.services.LogOps._
-import org.thp.thehive.services.ObservableOps._
-import org.thp.thehive.services.TaskOps._
-import org.thp.thehive.services.{LogSrv, OrganisationSrv}
+import org.thp.thehive.services.{LogSrv, OrganisationSrv, TheHiveOps}
 import play.api.libs.json.{JsObject, Json, OWrites}
 
 import java.util.{Date, Map => JMap}
@@ -41,7 +34,9 @@ class ActionSrv(
     implicit val db: Database,
     implicit val ec: ExecutionContext,
     auditSrv: CortexAuditSrv
-) extends VertexSrv[Action] {
+) extends VertexSrv[Action]
+    with TheHiveOps
+    with CortexOps {
 
   lazy val cortexActor: ActorRef @@ CortexTag = _cortexActor
   val actionContextSrv                        = new EdgeSrv[ActionContext, Action, Product]
@@ -206,7 +201,7 @@ class ActionSrv(
   def listForEntity(id: EntityId)(implicit graph: Graph): Seq[RichAction] = startTraversal.forEntity(id).richAction.toSeq
 }
 
-object ActionOps {
+trait ActionOps { _: CortexOps =>
 
   implicit class ActionOpsDefs(traversal: Traversal.V[Action]) {
 

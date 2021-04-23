@@ -2,14 +2,9 @@ package org.thp.thehive.controllers.dav
 
 import org.thp.scalligraph.auth.AuthContext
 import org.thp.scalligraph.traversal.Graph
-import org.thp.scalligraph.traversal.TraversalOps._
-import org.thp.thehive.services.CaseOps._
-import org.thp.thehive.services.LogOps._
-import org.thp.thehive.services.ObservableOps._
-import org.thp.thehive.services.TaskOps._
-import org.thp.thehive.services.{CaseSrv, OrganisationSrv}
+import org.thp.thehive.services._
 
-class VFS(caseSrv: CaseSrv, organisationSrv: OrganisationSrv) {
+class VFS(caseSrv: CaseSrv, organisationSrv: OrganisationSrv) extends TheHiveOps {
 
   def get(path: List[String])(implicit graph: Graph, authContext: AuthContext): Seq[Resource] =
     path match {

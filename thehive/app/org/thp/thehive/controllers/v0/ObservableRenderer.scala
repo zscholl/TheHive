@@ -2,20 +2,16 @@ package org.thp.thehive.controllers.v0
 
 import org.thp.scalligraph.auth.AuthContext
 import org.thp.scalligraph.traversal.Traversal.V
-import org.thp.scalligraph.traversal.TraversalOps._
 import org.thp.scalligraph.traversal.{Converter, Traversal}
 import org.thp.thehive.controllers.v0.Conversion._
 import org.thp.thehive.models.Observable
-import org.thp.thehive.services.AlertOps._
-import org.thp.thehive.services.CaseOps._
-import org.thp.thehive.services.ObservableOps._
-import org.thp.thehive.services.OrganisationSrv
+import org.thp.thehive.services.{OrganisationSrv, TheHiveOps}
 import play.api.libs.json.{JsObject, Json}
 
 import java.lang.{Boolean => JBoolean, Long => JLong}
 import java.util.{Map => JMap}
 
-trait ObservableRenderer {
+trait ObservableRenderer extends TheHiveOps {
 
   def observableStatsRenderer(organisationSrv: OrganisationSrv)(implicit
       authContext: AuthContext

@@ -3,15 +3,11 @@ package org.thp.thehive.controllers.v0
 import org.thp.scalligraph.controllers._
 import org.thp.scalligraph.models.{Database, UMapping}
 import org.thp.scalligraph.query._
-import org.thp.scalligraph.traversal.TraversalOps._
 import org.thp.scalligraph.traversal.{IteratorOutput, Traversal}
 import org.thp.scalligraph.{EntityIdOrName, RichOptionTry}
 import org.thp.thehive.controllers.v0.Conversion._
 import org.thp.thehive.dto.v0.InputTask
 import org.thp.thehive.models._
-import org.thp.thehive.services.CaseOps._
-import org.thp.thehive.services.OrganisationOps._
-import org.thp.thehive.services.TaskOps._
 import org.thp.thehive.services._
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Results}
@@ -24,7 +20,8 @@ class TaskCtrl(
     organisationSrv: OrganisationSrv,
     override val queryExecutor: QueryExecutor,
     override val publicData: PublicTask
-) extends QueryCtrl {
+) extends QueryCtrl
+    with TheHiveOps {
 
   def create(caseId: String): Action[AnyContent] =
     entrypoint("create task")
@@ -90,7 +87,7 @@ class TaskCtrl(
   }
 }
 
-class PublicTask(taskSrv: TaskSrv, organisationSrv: OrganisationSrv, userSrv: UserSrv) extends PublicData {
+class PublicTask(taskSrv: TaskSrv, organisationSrv: OrganisationSrv, userSrv: UserSrv) extends PublicData with TheHiveOps {
   override val entityName: String = "task"
   override val initialQuery: Query =
     Query.init[Traversal.V[Task]](

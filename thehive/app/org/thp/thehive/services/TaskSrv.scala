@@ -7,14 +7,10 @@ import org.thp.scalligraph.models.{Entity, Model}
 import org.thp.scalligraph.query.PropertyUpdater
 import org.thp.scalligraph.services._
 import org.thp.scalligraph.traversal.Converter.Identity
-import org.thp.scalligraph.traversal.TraversalOps._
 import org.thp.scalligraph.traversal.{Converter, Graph, Traversal}
 import org.thp.scalligraph.utils.FunctionalCondition._
 import org.thp.scalligraph.{EntityId, EntityIdOrName}
 import org.thp.thehive.models.{TaskStatus, _}
-import org.thp.thehive.services.OrganisationOps._
-import org.thp.thehive.services.ShareOps._
-import org.thp.thehive.services.TaskOps._
 import play.api.libs.json.{JsNull, JsObject, Json}
 
 import java.lang.{Boolean => JBoolean}
@@ -28,7 +24,8 @@ class TaskSrv(
     userSrv: UserSrv,
     shareSrv: ShareSrv,
     logSrv: LogSrv
-) extends VertexSrv[Task] {
+) extends VertexSrv[Task]
+    with TheHiveOps {
 
   val caseTemplateTaskSrv = new EdgeSrv[CaseTemplateTask, CaseTemplate, Task]
   val taskUserSrv         = new EdgeSrv[TaskUser, Task, User]
@@ -138,7 +135,7 @@ class TaskSrv(
   }
 }
 
-object TaskOps {
+trait TaskOps { _: TheHiveOps =>
   implicit class TaskOpsDefs(traversal: Traversal.V[Task]) {
 
     def get(idOrName: EntityIdOrName): Traversal.V[Task] =

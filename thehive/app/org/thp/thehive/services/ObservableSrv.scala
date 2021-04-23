@@ -8,15 +8,10 @@ import org.thp.scalligraph.models.{Database, Entity}
 import org.thp.scalligraph.query.PropertyUpdater
 import org.thp.scalligraph.services._
 import org.thp.scalligraph.traversal.Converter.Identity
-import org.thp.scalligraph.traversal.TraversalOps._
 import org.thp.scalligraph.traversal.{Converter, Graph, StepLabel, Traversal}
 import org.thp.scalligraph.utils.Hash
 import org.thp.scalligraph.{BadRequestError, CreateError, EntityId, EntityIdOrName, EntityName, RichSeq}
 import org.thp.thehive.models._
-import org.thp.thehive.services.AlertOps._
-import org.thp.thehive.services.ObservableOps._
-import org.thp.thehive.services.OrganisationOps._
-import org.thp.thehive.services.ShareOps._
 import play.api.libs.json.{JsObject, Json}
 
 import java.util.{Map => JMap}
@@ -30,7 +25,8 @@ class ObservableSrv(
     auditSrv: AuditSrv,
     shareSrv: ShareSrv,
     organisationSrv: OrganisationSrv
-) extends VertexSrv[Observable] {
+) extends VertexSrv[Observable]
+    with TheHiveOps {
   val observableDataSrv        = new EdgeSrv[ObservableData, Observable, Data]
   val observableObservableType = new EdgeSrv[ObservableObservableType, Observable, ObservableType]
   val observableAttachmentSrv  = new EdgeSrv[ObservableAttachment, Observable, Attachment]
@@ -172,7 +168,7 @@ class ObservableSrv(
     }
 }
 
-object ObservableOps {
+trait ObservableOps { _: TheHiveOps =>
 
   implicit class ObservableOpsDefs(traversal: Traversal.V[Observable]) {
     def get(idOrName: EntityIdOrName): Traversal.V[Observable] =
@@ -348,7 +344,7 @@ object ObservableOps {
   }
 }
 
-class ObservableIntegrityCheckOps(val db: Database, val service: ObservableSrv) extends IntegrityCheckOps[Observable] {
+class ObservableIntegrityCheckOps(val db: Database, val service: ObservableSrv) extends IntegrityCheckOps[Observable] with TheHiveOps {
   override def resolve(entities: Seq[Observable with Entity])(implicit graph: Graph): Try[Unit] = Success(())
 
   override def globalCheck(): Map[String, Long] =

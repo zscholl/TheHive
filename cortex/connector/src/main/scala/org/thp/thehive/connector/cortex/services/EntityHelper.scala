@@ -3,14 +3,8 @@ package org.thp.thehive.connector.cortex.services
 import org.thp.scalligraph.auth.{AuthContext, Permission}
 import org.thp.scalligraph.models.Entity
 import org.thp.scalligraph.traversal.Graph
-import org.thp.scalligraph.traversal.TraversalOps._
 import org.thp.scalligraph.{BadRequestError, EntityIdOrName}
 import org.thp.thehive.models._
-import org.thp.thehive.services.AlertOps._
-import org.thp.thehive.services.CaseOps._
-import org.thp.thehive.services.LogOps._
-import org.thp.thehive.services.ObservableOps._
-import org.thp.thehive.services.TaskOps._
 import org.thp.thehive.services._
 import play.api.Logger
 
@@ -23,7 +17,7 @@ class EntityHelper(
     observableSrv: ObservableSrv,
     logSrv: LogSrv,
     organisationSrv: OrganisationSrv
-) {
+) extends TheHiveOps {
 
   lazy val logger: Logger = Logger(getClass)
 

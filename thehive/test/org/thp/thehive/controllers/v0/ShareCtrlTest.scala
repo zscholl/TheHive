@@ -2,14 +2,13 @@ package org.thp.thehive.controllers.v0
 
 import org.thp.scalligraph.EntityName
 import org.thp.scalligraph.models.DummyUserSrv
-import org.thp.scalligraph.traversal.TraversalOps._
 import org.thp.thehive.dto.v0._
 import org.thp.thehive.models.Profile
-import org.thp.thehive.services.CaseOps._
+import org.thp.thehive.services.TheHiveOps
 import play.api.libs.json.Json
 import play.api.test.{FakeRequest, PlaySpecification}
 
-class ShareCtrlTest extends PlaySpecification with TestAppBuilder {
+class ShareCtrlTest extends PlaySpecification with TestAppBuilder with TheHiveOps {
   "share a case" in testApp { app =>
     import app._
     import app.thehiveModule._

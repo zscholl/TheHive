@@ -9,17 +9,8 @@ import org.thp.scalligraph.EntityId
 import org.thp.scalligraph.auth.AuthContext
 import org.thp.scalligraph.models.{Entity, _}
 import org.thp.scalligraph.services._
-import org.thp.scalligraph.traversal.TraversalOps._
 import org.thp.scalligraph.traversal.{Converter, Graph, IdentityConverter, Traversal}
 import org.thp.thehive.models._
-import org.thp.thehive.services.AlertOps._
-import org.thp.thehive.services.AuditOps._
-import org.thp.thehive.services.CaseOps._
-import org.thp.thehive.services.CaseTemplateOps._
-import org.thp.thehive.services.DashboardOps._
-import org.thp.thehive.services.ObservableOps._
-import org.thp.thehive.services.OrganisationOps._
-import org.thp.thehive.services.TaskOps._
 import org.thp.thehive.services.notification.{AuditNotificationMessage, NotificationTag}
 import play.api.libs.json.{JsObject, JsValue, Json}
 
@@ -33,7 +24,8 @@ class AuditSrv(
     _notificationActor: => ActorRef @@ NotificationTag,
     eventSrv: EventSrv,
     db: Database
-) extends VertexSrv[Audit] { auditSrv =>
+) extends VertexSrv[Audit]
+    with TheHiveOps { auditSrv =>
   lazy val userSrv: UserSrv                                = _userSrv
   lazy val notificationActor: ActorRef @@ NotificationTag  = _notificationActor
   val auditUserSrv                                         = new EdgeSrv[AuditUser, Audit, User]
@@ -311,7 +303,7 @@ class AuditSrv(
   }
 }
 
-object AuditOps {
+trait AuditOps { _: TheHiveOps =>
 
   implicit class VertexDefs(traversal: Traversal[Vertex, Vertex, IdentityConverter[Vertex]]) {
     def share: Traversal.V[Share] = traversal.coalesceIdent(_.in[ShareObservable], _.in[ShareTask], _.in[ShareCase]).v[Share]

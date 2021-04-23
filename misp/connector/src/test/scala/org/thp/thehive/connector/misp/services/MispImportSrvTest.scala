@@ -4,19 +4,16 @@ import akka.stream.scaladsl.Sink
 import org.thp.misp.dto.{Event, Organisation, Tag, User}
 import org.thp.scalligraph.auth.AuthContext
 import org.thp.scalligraph.models.DummyUserSrv
-import org.thp.scalligraph.traversal.TraversalOps._
 import org.thp.scalligraph.{EntityId, EntityName}
 import org.thp.thehive.connector.misp.TestAppBuilder
 import org.thp.thehive.models.{Alert, Permissions}
-import org.thp.thehive.services.AlertOps._
-import org.thp.thehive.services.ObservableOps._
-import org.thp.thehive.services.OrganisationOps._
+import org.thp.thehive.services.TheHiveOps
 import play.api.test.PlaySpecification
 
 import java.util.{Date, UUID}
 import scala.concurrent.duration.DurationInt
 
-class MispImportSrvTest extends PlaySpecification with TestAppBuilder {
+class MispImportSrvTest extends PlaySpecification with TestAppBuilder with TheHiveOps {
   sequential
 
   implicit val authContext: AuthContext =

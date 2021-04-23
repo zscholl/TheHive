@@ -9,12 +9,9 @@ import org.thp.scalligraph.auth.AuthContext
 import org.thp.scalligraph.models.{Database, Entity}
 import org.thp.scalligraph.services.config.{ApplicationConfig, ConfigItem}
 import org.thp.scalligraph.services.{EdgeSrv, IntegrityCheckOps, VertexSrv}
-import org.thp.scalligraph.traversal.TraversalOps._
 import org.thp.scalligraph.traversal.{Converter, Graph, Traversal}
 import org.thp.scalligraph.utils.FunctionalCondition.When
 import org.thp.thehive.models._
-import org.thp.thehive.services.OrganisationOps._
-import org.thp.thehive.services.TagOps._
 
 import java.util.{Map => JMap}
 import scala.util.matching.Regex
@@ -25,7 +22,8 @@ class TagSrv(
     taxonomySrv: TaxonomySrv,
     appConfig: ApplicationConfig,
     integrityCheckActor: => ActorRef @@ IntegrityCheckTag
-) extends VertexSrv[Tag] {
+) extends VertexSrv[Tag]
+    with TheHiveOps {
   lazy val organisationSrv: OrganisationSrv = _organisationSrv
 
   val taxonomyTagSrv = new EdgeSrv[TaxonomyTag, Taxonomy, Tag]
@@ -110,7 +108,7 @@ class TagSrv(
   }
 }
 
-object TagOps {
+trait TagOps { _: TheHiveOps =>
 
   implicit class TagOpsDefs(traversal: Traversal.V[Tag]) {
 
@@ -172,7 +170,7 @@ object TagOps {
   }
 }
 
-class TagIntegrityCheckOps(val db: Database, val service: TagSrv) extends IntegrityCheckOps[Tag] {
+class TagIntegrityCheckOps(val db: Database, val service: TagSrv) extends IntegrityCheckOps[Tag] with TheHiveOps {
 
   override def resolve(entities: Seq[Tag with Entity])(implicit graph: Graph): Try[Unit] = {
     firstCreatedEntity(entities).foreach {

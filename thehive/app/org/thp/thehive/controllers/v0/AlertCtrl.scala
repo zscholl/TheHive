@@ -6,7 +6,6 @@ import org.thp.scalligraph.auth.AuthContext
 import org.thp.scalligraph.controllers._
 import org.thp.scalligraph.models.{Database, Entity, UMapping}
 import org.thp.scalligraph.query._
-import org.thp.scalligraph.traversal.TraversalOps._
 import org.thp.scalligraph.traversal._
 import org.thp.scalligraph.{
   AuthorizationError,
@@ -22,13 +21,8 @@ import org.thp.thehive.controllers.v0.Conversion._
 import org.thp.thehive.dto.v0.{InputAlert, InputObservable, OutputSimilarCase}
 import org.thp.thehive.dto.v1.InputCustomFieldValue
 import org.thp.thehive.models._
-import org.thp.thehive.services.AlertOps._
-import org.thp.thehive.services.CaseOps._
-import org.thp.thehive.services.CaseTemplateOps._
-import org.thp.thehive.services.ObservableOps._
-import org.thp.thehive.services.OrganisationOps._
-import org.thp.thehive.services.UserOps._
 import org.thp.thehive.services._
+import play.api.Logger
 import play.api.libs.json.{JsArray, JsObject, JsValue, Json}
 import play.api.mvc.{Action, AnyContent, Results}
 
@@ -51,7 +45,8 @@ class AlertCtrl(
     override val publicData: PublicAlert,
     implicit val db: Database,
     override val queryExecutor: QueryExecutor
-) extends QueryCtrl {
+) extends QueryCtrl
+    with TheHiveOps {
   def create: Action[AnyContent] =
     entrypoint("create alert")
       .extract("alert", FieldsParser[InputAlert])
@@ -345,7 +340,11 @@ class PublicAlert(
     organisationSrv: OrganisationSrv,
     customFieldSrv: CustomFieldSrv,
     db: Database
-) extends PublicData {
+) extends PublicData
+    with TheHiveOps {
+
+  lazy val logger: Logger = Logger(getClass)
+
   override val entityName: String = "alert"
   override val initialQuery: Query =
     Query

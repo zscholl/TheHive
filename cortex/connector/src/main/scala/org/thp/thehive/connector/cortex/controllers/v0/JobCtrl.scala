@@ -3,18 +3,15 @@ package org.thp.thehive.connector.cortex.controllers.v0
 import org.thp.scalligraph.controllers.{Entrypoint, FieldsParser}
 import org.thp.scalligraph.models.{Database, UMapping}
 import org.thp.scalligraph.query._
-import org.thp.scalligraph.traversal.TraversalOps._
 import org.thp.scalligraph.traversal.{IteratorOutput, Traversal}
 import org.thp.scalligraph.{AuthorizationError, EntityIdOrName, ErrorHandler}
 import org.thp.thehive.connector.cortex.controllers.v0.Conversion._
 import org.thp.thehive.connector.cortex.models.{Job, RichJob}
-import org.thp.thehive.connector.cortex.services.JobOps._
-import org.thp.thehive.connector.cortex.services.JobSrv
+import org.thp.thehive.connector.cortex.services.{CortexOps, JobSrv}
 import org.thp.thehive.controllers.v0.Conversion._
 import org.thp.thehive.controllers.v0.{OutputParam, PublicData, QueryCtrl}
 import org.thp.thehive.models.{Observable, Permissions, RichCase, RichObservable}
-import org.thp.thehive.services.ObservableOps._
-import org.thp.thehive.services.ObservableSrv
+import org.thp.thehive.services.{ObservableSrv, TheHiveOps}
 import play.api.mvc.{Action, AnyContent, Results}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -27,7 +24,9 @@ class JobCtrl(
     implicit val ec: ExecutionContext,
     override val queryExecutor: QueryExecutor,
     override val publicData: PublicJob
-) extends QueryCtrl {
+) extends QueryCtrl
+    with CortexOps
+    with TheHiveOps {
   def get(jobId: String): Action[AnyContent] =
     entrypoint("get job")
       .authRoTransaction(db) { implicit request => implicit graph =>

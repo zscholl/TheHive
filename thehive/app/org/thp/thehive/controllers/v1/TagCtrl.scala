@@ -7,12 +7,10 @@ import org.thp.scalligraph.controllers.{Entrypoint, FieldsParser}
 import org.thp.scalligraph.models.{Database, Entity}
 import org.thp.scalligraph.query._
 import org.thp.scalligraph.services.config.{ApplicationConfig, ConfigItem}
-import org.thp.scalligraph.traversal.TraversalOps._
 import org.thp.scalligraph.traversal.{Converter, IteratorOutput, Traversal}
 import org.thp.scalligraph.utils.FunctionalCondition.When
 import org.thp.thehive.controllers.v1.Conversion._
 import org.thp.thehive.models.{Permissions, Tag}
-import org.thp.thehive.services.TagOps._
 import org.thp.thehive.services.{OrganisationSrv, TagSrv}
 import play.api.mvc.{Action, AnyContent, Results}
 

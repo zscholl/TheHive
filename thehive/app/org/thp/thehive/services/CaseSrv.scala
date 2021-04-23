@@ -7,24 +7,14 @@ import org.apache.tinkerpop.gremlin.structure.Vertex
 import org.thp.scalligraph.auth.{AuthContext, Permission}
 import org.thp.scalligraph.controllers.{FFile, FPathElem}
 import org.thp.scalligraph.models._
-import org.thp.scalligraph.query.PredicateOps.PredicateOpsDefs
 import org.thp.scalligraph.query.PropertyUpdater
 import org.thp.scalligraph.services._
 import org.thp.scalligraph.traversal.Converter.Identity
-import org.thp.scalligraph.traversal.TraversalOps._
 import org.thp.scalligraph.traversal._
 import org.thp.scalligraph.{BadRequestError, EntityId, EntityIdOrName, EntityName, RichOptionTry, RichSeq}
 import org.thp.thehive.controllers.v1.Conversion._
 import org.thp.thehive.dto.v1.InputCustomFieldValue
 import org.thp.thehive.models._
-import org.thp.thehive.services.CaseOps._
-import org.thp.thehive.services.CustomFieldOps._
-import org.thp.thehive.services.DataOps._
-import org.thp.thehive.services.ObservableOps._
-import org.thp.thehive.services.OrganisationOps._
-import org.thp.thehive.services.ShareOps._
-import org.thp.thehive.services.TaskOps._
-import org.thp.thehive.services.UserOps._
 import play.api.cache.SyncCacheApi
 import play.api.libs.json.{JsNull, JsObject, JsValue, Json}
 
@@ -48,7 +38,8 @@ class CaseSrv(
     _alertSrv: => AlertSrv,
     integrityCheckActor: => ActorRef @@ IntegrityCheckTag,
     cache: SyncCacheApi
-) extends VertexSrv[Case] {
+) extends VertexSrv[Case]
+    with TheHiveOps {
   lazy val alertSrv: AlertSrv = _alertSrv
 
   val caseTagSrv              = new EdgeSrv[CaseTag, Case, Tag]
@@ -433,7 +424,7 @@ class CaseSrv(
       .map(_ => ())
 }
 
-object CaseOps {
+trait CaseOps { _: TheHiveOps =>
 
   implicit class CaseOpsDefs(traversal: Traversal.V[Case]) {
 
@@ -682,7 +673,8 @@ object CaseOps {
 }
 
 class CaseIntegrityCheckOps(val db: Database, val service: CaseSrv, userSrv: UserSrv, caseTemplateSrv: CaseTemplateSrv)
-    extends IntegrityCheckOps[Case] {
+    extends IntegrityCheckOps[Case]
+    with TheHiveOps {
   def removeDuplicates(): Unit =
     findDuplicates()
       .foreach { entities =>

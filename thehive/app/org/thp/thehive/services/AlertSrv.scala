@@ -6,20 +6,13 @@ import org.apache.tinkerpop.gremlin.process.traversal.{Order, P}
 import org.thp.scalligraph.auth.{AuthContext, Permission}
 import org.thp.scalligraph.controllers.FFile
 import org.thp.scalligraph.models._
-import org.thp.scalligraph.query.PredicateOps.PredicateOpsDefs
 import org.thp.scalligraph.query.PropertyUpdater
 import org.thp.scalligraph.services._
-import org.thp.scalligraph.traversal.TraversalOps._
 import org.thp.scalligraph.traversal._
 import org.thp.scalligraph.{BadRequestError, CreateError, EntityId, EntityIdOrName, RichOptionTry, RichSeq}
 import org.thp.thehive.controllers.v1.Conversion._
 import org.thp.thehive.dto.v1.InputCustomFieldValue
 import org.thp.thehive.models._
-import org.thp.thehive.services.AlertOps._
-import org.thp.thehive.services.CaseOps._
-import org.thp.thehive.services.CaseTemplateOps._
-import org.thp.thehive.services.CustomFieldOps._
-import org.thp.thehive.services.ObservableOps._
 import play.api.libs.json.{JsObject, JsValue, Json}
 
 import java.lang.{Long => JLong}
@@ -36,7 +29,8 @@ class AlertSrv(
     auditSrv: AuditSrv,
     attachmentSrv: AttachmentSrv,
     integrityCheckActor: => ActorRef @@ IntegrityCheckTag
-) extends VertexSrv[Alert] {
+) extends VertexSrv[Alert]
+    with TheHiveOps {
 
   val alertTagSrv          = new EdgeSrv[AlertTag, Alert, Tag]
   val alertCustomFieldSrv  = new EdgeSrv[AlertCustomField, Alert, CustomField]
@@ -364,7 +358,7 @@ class AlertSrv(
     }
 }
 
-object AlertOps {
+trait AlertOps { _: TheHiveOps =>
 
   implicit class AlertOpsDefs(traversal: Traversal.V[Alert]) {
     def get(idOrSource: EntityIdOrName): Traversal.V[Alert] =
@@ -596,7 +590,9 @@ object AlertOps {
   implicit class AlertCustomFieldsOpsDefs(traversal: Traversal.E[AlertCustomField]) extends CustomFieldValueOpsDefs(traversal)
 }
 
-class AlertIntegrityCheckOps(val db: Database, val service: AlertSrv, organisationSrv: OrganisationSrv) extends IntegrityCheckOps[Alert] {
+class AlertIntegrityCheckOps(val db: Database, val service: AlertSrv, organisationSrv: OrganisationSrv)
+    extends IntegrityCheckOps[Alert]
+    with TheHiveOps {
 
   override def resolve(entities: Seq[Alert with Entity])(implicit graph: Graph): Try[Unit] = {
     val (imported, notImported) = entities.partition(_.caseId.isDefined)

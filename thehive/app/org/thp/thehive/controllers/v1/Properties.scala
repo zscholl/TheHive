@@ -3,28 +3,10 @@ package org.thp.thehive.controllers.v1
 import org.apache.tinkerpop.gremlin.structure.T
 import org.thp.scalligraph.controllers.{FPathElem, FPathEmpty, FString}
 import org.thp.scalligraph.models.{Database, UMapping}
-import org.thp.scalligraph.query.PredicateOps._
 import org.thp.scalligraph.query.{PublicProperties, PublicPropertyListBuilder}
-import org.thp.scalligraph.traversal.TraversalOps._
 import org.thp.scalligraph.{BadRequestError, EntityId, EntityIdOrName, InvalidFormatAttributeError, RichSeq}
 import org.thp.thehive.dto.v1.InputCustomFieldValue
 import org.thp.thehive.models._
-import org.thp.thehive.services.AlertOps._
-import org.thp.thehive.services.AuditOps._
-import org.thp.thehive.services.CaseOps._
-import org.thp.thehive.services.CaseTemplateOps._
-import org.thp.thehive.services.CustomFieldOps._
-import org.thp.thehive.services.DashboardOps._
-import org.thp.thehive.services.LogOps._
-import org.thp.thehive.services.ObservableOps._
-import org.thp.thehive.services.OrganisationOps._
-import org.thp.thehive.services.PatternOps._
-import org.thp.thehive.services.ProcedureOps._
-import org.thp.thehive.services.ShareOps._
-import org.thp.thehive.services.TagOps._
-import org.thp.thehive.services.TaskOps._
-import org.thp.thehive.services.TaxonomyOps._
-import org.thp.thehive.services.UserOps._
 import org.thp.thehive.services._
 import play.api.libs.json.{JsObject, JsValue, Json}
 
@@ -41,7 +23,7 @@ class Properties(
     customFieldSrv: CustomFieldSrv,
     organisationSrv: OrganisationSrv,
     db: Database
-) {
+) extends TheHiveOps {
 
   lazy val metaProperties: PublicProperties =
     PublicPropertyListBuilder

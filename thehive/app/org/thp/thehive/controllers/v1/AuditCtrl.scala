@@ -4,12 +4,10 @@ import org.thp.scalligraph.EntityIdOrName
 import org.thp.scalligraph.controllers.Entrypoint
 import org.thp.scalligraph.models.{Database, Schema}
 import org.thp.scalligraph.query.{ParamQuery, PublicProperties, Query}
-import org.thp.scalligraph.traversal.TraversalOps._
 import org.thp.scalligraph.traversal.{IteratorOutput, Traversal}
 import org.thp.thehive.controllers.v1.Conversion._
 import org.thp.thehive.models.{Audit, RichAudit}
-import org.thp.thehive.services.AuditOps._
-import org.thp.thehive.services.{AuditSrv, OrganisationSrv}
+import org.thp.thehive.services.{AuditSrv, OrganisationSrv, TheHiveOps}
 import play.api.mvc.{Action, AnyContent, Results}
 
 import scala.util.Success
@@ -21,7 +19,8 @@ class AuditCtrl(
     auditSrv: AuditSrv,
     organisationSrv: OrganisationSrv,
     implicit val schema: Schema
-) extends QueryableCtrl {
+) extends QueryableCtrl
+    with TheHiveOps {
 
   val entityName: String = "audit"
 

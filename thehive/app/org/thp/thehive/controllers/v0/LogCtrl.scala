@@ -4,15 +4,11 @@ import org.thp.scalligraph.EntityIdOrName
 import org.thp.scalligraph.controllers.{Entrypoint, FieldsParser}
 import org.thp.scalligraph.models.{Database, UMapping}
 import org.thp.scalligraph.query._
-import org.thp.scalligraph.traversal.TraversalOps._
 import org.thp.scalligraph.traversal.{IteratorOutput, Traversal}
 import org.thp.thehive.controllers.v0.Conversion._
 import org.thp.thehive.dto.v0.InputLog
 import org.thp.thehive.models.{Log, Permissions, RichLog}
-import org.thp.thehive.services.CaseOps._
-import org.thp.thehive.services.LogOps._
-import org.thp.thehive.services.TaskOps._
-import org.thp.thehive.services.{LogSrv, OrganisationSrv, TaskSrv}
+import org.thp.thehive.services.{LogSrv, OrganisationSrv, TaskSrv, TheHiveOps}
 import play.api.mvc.{Action, AnyContent, Results}
 
 class LogCtrl(
@@ -22,7 +18,8 @@ class LogCtrl(
     taskSrv: TaskSrv,
     override val queryExecutor: QueryExecutor,
     override val publicData: PublicLog
-) extends QueryCtrl {
+) extends QueryCtrl
+    with TheHiveOps {
 
   def create(taskId: String): Action[AnyContent] =
     entrypoint("create log")
@@ -69,7 +66,7 @@ class LogCtrl(
       }
 }
 
-class PublicLog(logSrv: LogSrv, organisationSrv: OrganisationSrv) extends PublicData {
+class PublicLog(logSrv: LogSrv, organisationSrv: OrganisationSrv) extends PublicData with TheHiveOps {
   override val entityName: String = "log"
   override val initialQuery: Query =
     Query.init[Traversal.V[Log]]("listLog", (graph, authContext) => logSrv.startTraversal(graph).visible(organisationSrv)(authContext))

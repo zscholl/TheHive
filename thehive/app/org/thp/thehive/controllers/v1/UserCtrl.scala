@@ -4,16 +4,11 @@ import org.thp.scalligraph.auth.AuthSrv
 import org.thp.scalligraph.controllers.{Entrypoint, FieldsParser}
 import org.thp.scalligraph.models.Database
 import org.thp.scalligraph.query.{ParamQuery, PublicProperties, Query}
-import org.thp.scalligraph.traversal.TraversalOps._
 import org.thp.scalligraph.traversal.{IteratorOutput, Traversal}
 import org.thp.scalligraph.{AuthorizationError, BadRequestError, EntityIdOrName, NotFoundError, RichOptionTry}
 import org.thp.thehive.controllers.v1.Conversion._
 import org.thp.thehive.dto.v1.InputUser
 import org.thp.thehive.models._
-import org.thp.thehive.services.CaseOps._
-import org.thp.thehive.services.OrganisationOps._
-import org.thp.thehive.services.TaskOps._
-import org.thp.thehive.services.UserOps._
 import org.thp.thehive.services._
 import play.api.http.HttpEntity
 import play.api.libs.json.{JsNull, JsObject, Json}
@@ -35,7 +30,8 @@ class UserCtrl(
     auditSrv: AuditSrv,
     attachmentSrv: AttachmentSrv,
     implicit val db: Database
-) extends QueryableCtrl {
+) extends QueryableCtrl
+    with TheHiveOps {
 
   override val entityName: String                 = "user"
   override val publicProperties: PublicProperties = properties.user
