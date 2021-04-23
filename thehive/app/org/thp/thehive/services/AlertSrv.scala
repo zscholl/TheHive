@@ -2,7 +2,7 @@ package org.thp.thehive.services
 
 import akka.actor.ActorRef
 import com.softwaremill.tagging.@@
-import org.apache.tinkerpop.gremlin.process.traversal.{Order, P}
+import org.apache.tinkerpop.gremlin.process.traversal.Order
 import org.thp.scalligraph.auth.{AuthContext, Permission}
 import org.thp.scalligraph.controllers.FFile
 import org.thp.scalligraph.models._
@@ -13,7 +13,7 @@ import org.thp.scalligraph.{BadRequestError, CreateError, EntityId, EntityIdOrNa
 import org.thp.thehive.controllers.v1.Conversion._
 import org.thp.thehive.dto.v1.InputCustomFieldValue
 import org.thp.thehive.models._
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.{JsObject, Json}
 
 import java.lang.{Long => JLong}
 import java.util.{Date, Map => JMap}
@@ -175,7 +175,7 @@ class AlertSrv(
       graph: Graph,
       authContext: AuthContext
   ): Try[Unit] = {
-    val cfv = get(alert).customFields(EntityIdOrName(cf.name))
+    val cfv = get(alert).customFieldValue(EntityIdOrName(cf.name))
     if (cfv.clone().exists)
       cfv.setValue(cf.value)
     else
@@ -195,7 +195,7 @@ class AlertSrv(
       .richCustomField
       .toIterator
       .filterNot(rcf => customFieldNames.contains(rcf.name))
-      .foreach(rcf => get(alert).customFields(rcf.customField._id).remove())
+      .foreach(rcf => get(alert).customFieldValue(rcf.customField._id).remove())
     customFieldValues
       .toTry { case (cf, v) => setOrCreateCustomField(alert, InputCustomFieldValue(cf.name, Some(v), None)) }
       .map(_ => ())
@@ -360,7 +360,7 @@ class AlertSrv(
 
 trait AlertOpsNoDeps { _: TheHiveOpsNoDeps =>
 
-  implicit class AlertOpsNoDepsDefs(traversal: Traversal.V[Alert]) {
+  implicit class AlertOpsNoDepsDefs(val traversal: Traversal.V[Alert]) extends EntityWithCustomFieldOpsNoDepsDefs[Alert, AlertCustomField] {
     def get(idOrSource: EntityIdOrName): Traversal.V[Alert] =
       idOrSource.fold(
         traversal.getByIds(_),
@@ -409,84 +409,6 @@ trait AlertOpsNoDeps { _: TheHiveOpsNoDeps =>
           .sack[Long],
         _.constant(0L)
       )
-
-    def customFields(idOrName: EntityIdOrName): Traversal.E[AlertCustomField] =
-      idOrName
-        .fold(
-          id => traversal.outE[AlertCustomField].filter(_.inV.getByIds(id)),
-          name => traversal.outE[AlertCustomField].filter(_.inV.v[CustomField].has(_.name, name))
-        )
-
-    def customFields: Traversal.E[AlertCustomField] = traversal.outE[AlertCustomField]
-
-    def customFieldJsonValue(customFieldSrv: CustomFieldSrv, customField: EntityIdOrName): Traversal.Domain[JsValue] =
-      customFieldSrv
-        .get(customField)(traversal.graph)
-        .value(_.`type`)
-        .headOption
-        .map(t => CustomFieldType.map(t).getJsonValue(traversal.customFields(customField)))
-        .getOrElse(traversal.empty.castDomain)
-
-    def richCustomFields: Traversal[RichCustomField, JMap[String, Any], Converter[RichCustomField, JMap[String, Any]]] =
-      traversal
-        .outE[AlertCustomField]
-        .project(_.by.by(_.inV.v[CustomField]))
-        .domainMap {
-          case (cfv, cf) => RichCustomField(cf, cfv)
-        }
-
-    def customFieldFilter(customFieldSrv: CustomFieldSrv, customField: EntityIdOrName, predicate: P[JsValue]): Traversal.V[Alert] =
-      customFieldSrv
-        .get(customField)(traversal.graph)
-        .value(_.`type`)
-        .headOption
-        .map {
-          case CustomFieldType.boolean =>
-            traversal.filter(_.customFields.has(_.booleanValue, predicate.mapValue(_.as[Boolean])).inV.v[CustomField].get(customField))
-          case CustomFieldType.date =>
-            traversal.filter(_.customFields.has(_.dateValue, predicate.mapValue(_.as[Date])).inV.v[CustomField].get(customField))
-          case CustomFieldType.float =>
-            traversal.filter(_.customFields.has(_.floatValue, predicate.mapValue(_.as[Double])).inV.v[CustomField].get(customField))
-          case CustomFieldType.integer =>
-            traversal.filter(_.customFields.has(_.integerValue, predicate.mapValue(_.as[Int])).inV.v[CustomField].get(customField))
-          case CustomFieldType.string =>
-            traversal.filter(_.customFields.has(_.stringValue, predicate.mapValue(_.as[String])).inV.v[CustomField].get(customField))
-        }
-        .getOrElse(traversal.empty)
-
-    def hasCustomField(customFieldSrv: CustomFieldSrv, customField: EntityIdOrName): Traversal.V[Alert] = {
-      val cfFilter = (t: Traversal.V[CustomField]) => customField.fold(id => t.hasId(id), name => t.has(_.name, name))
-
-      customFieldSrv
-        .get(customField)(traversal.graph)
-        .value(_.`type`)
-        .headOption
-        .map {
-          case CustomFieldType.boolean => traversal.filter(t => cfFilter(t.outE[AlertCustomField].has(_.booleanValue).inV.v[CustomField]))
-          case CustomFieldType.date    => traversal.filter(t => cfFilter(t.outE[AlertCustomField].has(_.dateValue).inV.v[CustomField]))
-          case CustomFieldType.float   => traversal.filter(t => cfFilter(t.outE[AlertCustomField].has(_.floatValue).inV.v[CustomField]))
-          case CustomFieldType.integer => traversal.filter(t => cfFilter(t.outE[AlertCustomField].has(_.integerValue).inV.v[CustomField]))
-          case CustomFieldType.string  => traversal.filter(t => cfFilter(t.outE[AlertCustomField].has(_.stringValue).inV.v[CustomField]))
-        }
-        .getOrElse(traversal.empty)
-    }
-
-    def hasNotCustomField(customFieldSrv: CustomFieldSrv, customField: EntityIdOrName): Traversal.V[Alert] = {
-      val cfFilter = (t: Traversal.V[CustomField]) => customField.fold(id => t.hasId(id), name => t.has(_.name, name))
-
-      customFieldSrv
-        .get(customField)(traversal.graph)
-        .value(_.`type`)
-        .headOption
-        .map {
-          case CustomFieldType.boolean => traversal.filterNot(t => cfFilter(t.outE[AlertCustomField].has(_.booleanValue).inV.v[CustomField]))
-          case CustomFieldType.date    => traversal.filterNot(t => cfFilter(t.outE[AlertCustomField].has(_.dateValue).inV.v[CustomField]))
-          case CustomFieldType.float   => traversal.filterNot(t => cfFilter(t.outE[AlertCustomField].has(_.floatValue).inV.v[CustomField]))
-          case CustomFieldType.integer => traversal.filterNot(t => cfFilter(t.outE[AlertCustomField].has(_.integerValue).inV.v[CustomField]))
-          case CustomFieldType.string  => traversal.filterNot(t => cfFilter(t.outE[AlertCustomField].has(_.stringValue).inV.v[CustomField]))
-        }
-        .getOrElse(traversal.empty)
-    }
 
     def observables: Traversal.V[Observable] = traversal.out[AlertObservable].v[Observable]
 
@@ -539,14 +461,22 @@ trait AlertOpsNoDeps { _: TheHiveOpsNoDeps =>
               observableCount
             )
         }
+
+    override def customFields: Traversal.E[AlertCustomField] = traversal.outE[AlertCustomField]
   }
 
   implicit class AlertCustomFieldsOpsDefs(traversal: Traversal.E[AlertCustomField]) extends CustomFieldValueOpsDefs(traversal)
 }
 
-trait AlertOps { _: TheHiveOps =>
+trait AlertOps { alertOps: TheHiveOps =>
   protected val organisationSrv: OrganisationSrv
-  implicit class AlertOpsDefs(traversal: Traversal.V[Alert]) {
+  protected val customFieldSrv: CustomFieldSrv
+
+  implicit class AlertOpsDefs(val traversal: Traversal.V[Alert]) extends EntityWithCustomFieldOpsDefs[Alert, AlertCustomField] {
+    override protected val customFieldSrv: CustomFieldSrv = alertOps.customFieldSrv
+    override def selectCustomField(traversal: Traversal.V[Alert]): Traversal.E[AlertCustomField] =
+      traversal.outE[AlertCustomField]
+
     def visible(implicit authContext: AuthContext): Traversal.V[Alert] =
       traversal.has(_.organisationId, organisationSrv.currentId(traversal.graph, authContext))
 

@@ -481,7 +481,7 @@ class CaseSrvTest extends PlaySpecification with TestAppBuilder with TheHiveOpsN
       import app._
       import app.thehiveModule._
 
-      TheHiveOps(organisationSrv) { ops =>
+      TheHiveOps(organisationSrv, customFieldSrv) { ops =>
         import ops.CaseOpsDefs
         database.roTransaction { implicit graph =>
           caseSrv

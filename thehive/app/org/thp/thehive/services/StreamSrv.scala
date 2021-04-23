@@ -35,7 +35,8 @@ case object Commit            extends StreamMessage
   * to global stream actor.
   */
 class StreamActor(
-    val organisationSrv: OrganisationSrv,
+    override val organisationSrv: OrganisationSrv,
+    override val customFieldSrv: CustomFieldSrv,
     authContext: AuthContext,
     refresh: FiniteDuration,
     maxWait: FiniteDuration,
@@ -133,6 +134,7 @@ class StreamSrv(
     appConfig: ApplicationConfig,
     eventSrv: EventSrv,
     organisationSrv: OrganisationSrv,
+    customFieldSrv: CustomFieldSrv,
     auditSrv: AuditSrv,
     db: Database,
     system: ActorSystem,
@@ -183,7 +185,7 @@ class StreamSrv(
     val streamId = generateStreamId()
     val streamActor =
       system.actorOf(
-        Props(classOf[StreamActor], organisationSrv, authContext, refresh, maxWait, graceDuration, keepAlive, auditSrv, db),
+        Props(classOf[StreamActor], organisationSrv, customFieldSrv, authContext, refresh, maxWait, graceDuration, keepAlive, auditSrv, db),
         s"stream-$streamId"
       )
     logger.debug(s"Register stream actor ${streamActor.path}")

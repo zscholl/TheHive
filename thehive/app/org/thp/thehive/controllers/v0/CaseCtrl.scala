@@ -21,7 +21,8 @@ class CaseCtrl(
     caseSrv: CaseSrv,
     caseTemplateSrv: CaseTemplateSrv,
     userSrv: UserSrv,
-    val organisationSrv: OrganisationSrv,
+    override val organisationSrv: OrganisationSrv,
+    override val customFieldSrv: CustomFieldSrv,
     override val publicData: PublicCase,
     override val queryExecutor: QueryExecutor,
     implicit override val db: Database
@@ -165,10 +166,10 @@ class CaseCtrl(
 
 class PublicCase(
     caseSrv: CaseSrv,
-    val organisationSrv: OrganisationSrv,
+    override val organisationSrv: OrganisationSrv,
     observableSrv: ObservableSrv,
     userSrv: UserSrv,
-    customFieldSrv: CustomFieldSrv,
+    override val customFieldSrv: CustomFieldSrv,
     implicit val db: Database
 ) extends PublicData
     with CaseRenderer
@@ -265,15 +266,15 @@ class PublicCase(
       })
       .property("customFields", UMapping.jsonNative)(_.subSelect {
         case (FPathElem(_, FPathElem(idOrName, _)), caseSteps) =>
-          caseSteps.customFieldJsonValue(customFieldSrv, EntityIdOrName(idOrName))
+          caseSteps.customFieldJsonValue(EntityIdOrName(idOrName))
         case (_, caseSteps) => caseSteps.customFields.nameJsonValue.fold.domainMap(JsObject(_))
       }
         .filter[JsValue] {
           case (FPathElem(_, FPathElem(name, _)), caseTraversal, _, predicate) =>
             predicate match {
-              case Right(predicate) => caseTraversal.customFieldFilter(customFieldSrv, EntityIdOrName(name), predicate)
-              case Left(true)       => caseTraversal.hasCustomField(customFieldSrv, EntityIdOrName(name))
-              case Left(false)      => caseTraversal.hasNotCustomField(customFieldSrv, EntityIdOrName(name))
+              case Right(predicate) => caseTraversal.customFieldFilter(EntityIdOrName(name), predicate)
+              case Left(true)       => caseTraversal.hasCustomField(EntityIdOrName(name))
+              case Left(false)      => caseTraversal.hasNotCustomField(EntityIdOrName(name))
             }
           case (_, caseTraversal, _, _) => caseTraversal.empty
         }

@@ -4,66 +4,67 @@ import org.thp.scalligraph.query.PredicateOps
 import org.thp.scalligraph.traversal.TraversalOps
 
 object TheHiveOps {
-  def apply[A](orgSrv: OrganisationSrv)(body: TheHiveOps => A): A =
+  def apply[A](orgSrv: OrganisationSrv, cfSrv: CustomFieldSrv)(body: TheHiveOps => A): A =
     body(new TheHiveOps {
       override protected val organisationSrv: OrganisationSrv = orgSrv
+      override protected val customFieldSrv: CustomFieldSrv   = cfSrv
     })
 }
 trait TheHiveOps
     extends TheHiveOpsNoDeps
-    with TaskOps
-    with PatternOps
-    with AuditOps
-    with TaxonomyOps
-    with ImpactStatusOps
-    with ObservableTypeOps
-    with ProfileOps
-    with ShareOps
-    with CaseTemplateOps
-    with ConfigOps
-    with LogOps
-    with PageOps
-    with ObservableOps
-    with UserOps
-    with AttachmentOps
-    with DashboardOps
-    with ProcedureOps
-    with DataOps
-    with CustomFieldOps
-    with CaseOps
     with AlertOps
+    with AttachmentOps
+    with AuditOps
+    with CaseOps
+    with CaseTemplateOps
+    with CustomFieldOps
+    with DashboardOps
+    with DataOps
+    with ConfigOps
+    with ImpactStatusOps
+    with LogOps
+    with ObservableOps
+    with ObservableTypeOps
+    with OrganisationOps
+    with PageOps
+    with PatternOps
+    with ProcedureOps
+    with ProfileOps
     with ReportTagOps
     with ResolutionStatusOps
-    with TagOps
     with RoleOps
-    with OrganisationOps
+    with ShareOps
+    with TagOps
+    with TaskOps
+    with TaxonomyOps
+    with UserOps
 
 trait TheHiveOpsNoDeps
     extends TraversalOps
     with PredicateOps
-    with TaskOpsNoDeps
-    with PatternOps
-    with AuditOpsNoDeps
-    with TaxonomyOps
-    with ImpactStatusOps
-    with ObservableTypeOps
-    with ProfileOps
-    with ShareOps
-    with CaseTemplateOps // TODO CustomFields
-    with ConfigOps
-    with LogOpsNoDeps
-    with PageOps
-    with ObservableOpsNoDeps
-    with UserOps
     with AttachmentOps
-    with DashboardOps
-    with ProcedureOps
-    with DataOps
-    with CustomFieldOps
-    with CaseOpsNoDeps  // TODO CustomFields
     with AlertOpsNoDeps // TODO CustomFields
-    with ReportTagOps
-    with ResolutionStatusOps
-    with TagOpsNoDeps
-    with RoleOps
+    with AuditOpsNoDeps
+    with CaseOpsNoDeps // TODO CustomFields
+    with CaseTemplateOpsNoDeps
+    with ConfigOps
+    with CustomFieldOps
+    with DashboardOps
+    with DataOps
+    with ImpactStatusOps
+    with LogOpsNoDeps
+    with ObservableOpsNoDeps
+    with ObservableTypeOps
     with OrganisationOps
+    with PageOps
+    with PatternOps
+    with ProfileOps
+    with ProcedureOps
+    with ResolutionStatusOps
+    with ReportTagOps
+    with RoleOps
+    with ShareOps
+    with TagOpsNoDeps
+    with TaskOpsNoDeps
+    with TaxonomyOps
+    with UserOps

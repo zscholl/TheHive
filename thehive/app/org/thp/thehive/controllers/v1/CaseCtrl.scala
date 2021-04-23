@@ -21,7 +21,8 @@ class CaseCtrl(
     observableSrv: ObservableSrv,
     userSrv: UserSrv,
     taskSrv: TaskSrv,
-    val organisationSrv: OrganisationSrv,
+    override val organisationSrv: OrganisationSrv,
+    override val customFieldSrv: CustomFieldSrv,
     alertSrv: AlertSrv,
     db: Database,
     appConfig: ApplicationConfig

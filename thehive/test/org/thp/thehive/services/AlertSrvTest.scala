@@ -156,7 +156,7 @@ class AlertSrvTest extends PlaySpecification with TestAppBuilder with TheHiveOps
       } must beSuccessfulTry
 
       database.roTransaction { implicit graph =>
-        alertSrv.get(EntityName("testType;testSource;ref1")).customFields(EntityIdOrName("string1")).nameJsonValue.headOption
+        alertSrv.get(EntityName("testType;testSource;ref1")).customFieldValue(EntityIdOrName("string1")).nameJsonValue.headOption
       } must beSome("string1" -> JsString("sad"))
     }
 

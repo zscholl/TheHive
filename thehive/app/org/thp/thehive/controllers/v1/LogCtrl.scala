@@ -8,7 +8,7 @@ import org.thp.scalligraph.traversal.{IteratorOutput, Traversal}
 import org.thp.thehive.controllers.v1.Conversion._
 import org.thp.thehive.dto.v1.InputLog
 import org.thp.thehive.models.{Log, Permissions, RichLog}
-import org.thp.thehive.services.{LogSrv, OrganisationSrv, TaskSrv, TheHiveOps}
+import org.thp.thehive.services.{CustomFieldSrv, LogSrv, OrganisationSrv, TaskSrv, TheHiveOps}
 import play.api.Logger
 import play.api.mvc.{Action, AnyContent, Results}
 
@@ -18,7 +18,8 @@ class LogCtrl(
     properties: Properties,
     logSrv: LogSrv,
     taskSrv: TaskSrv,
-    val organisationSrv: OrganisationSrv
+    override val organisationSrv: OrganisationSrv,
+    override val customFieldSrv: CustomFieldSrv
 ) extends QueryableCtrl
     with LogRenderer
     with TheHiveOps {

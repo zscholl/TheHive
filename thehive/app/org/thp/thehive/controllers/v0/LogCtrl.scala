@@ -8,7 +8,7 @@ import org.thp.scalligraph.traversal.{IteratorOutput, Traversal}
 import org.thp.thehive.controllers.v0.Conversion._
 import org.thp.thehive.dto.v0.InputLog
 import org.thp.thehive.models.{Log, Permissions, RichLog}
-import org.thp.thehive.services.{LogSrv, OrganisationSrv, TaskSrv, TheHiveOps, TheHiveOpsNoDeps}
+import org.thp.thehive.services.{CustomFieldSrv, LogSrv, OrganisationSrv, TaskSrv, TheHiveOps, TheHiveOpsNoDeps}
 import play.api.mvc.{Action, AnyContent, Results}
 
 class LogCtrl(
@@ -66,7 +66,9 @@ class LogCtrl(
       }
 }
 
-class PublicLog(logSrv: LogSrv, val organisationSrv: OrganisationSrv) extends PublicData with TheHiveOps {
+class PublicLog(logSrv: LogSrv, override val organisationSrv: OrganisationSrv, override val customFieldSrv: CustomFieldSrv)
+    extends PublicData
+    with TheHiveOps {
   override val entityName: String = "log"
   override val initialQuery: Query =
     Query.init[Traversal.V[Log]]("listLog", (graph, authContext) => logSrv.startTraversal(graph).visible(authContext))

@@ -61,7 +61,9 @@ class AuditCtrl(
       }
 }
 
-class PublicAudit(auditSrv: AuditSrv, val organisationSrv: OrganisationSrv, db: Database) extends PublicData with TheHiveOps {
+class PublicAudit(auditSrv: AuditSrv, val organisationSrv: OrganisationSrv, val customFieldSrv: CustomFieldSrv, db: Database)
+    extends PublicData
+    with TheHiveOps {
   override val getQuery: ParamQuery[EntityIdOrName] = Query.initWithParam[EntityIdOrName, Traversal.V[Audit]](
     "getAudit",
     (idOrName, graph, authContext) => auditSrv.get(idOrName)(graph).visible(authContext)

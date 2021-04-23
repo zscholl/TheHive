@@ -85,10 +85,10 @@ class CaseTemplateCtrl(
 
 class PublicCaseTemplate(
     caseTemplateSrv: CaseTemplateSrv,
-    organisationSrv: OrganisationSrv,
-    customFieldSrv: CustomFieldSrv
+    val organisationSrv: OrganisationSrv,
+    val customFieldSrv: CustomFieldSrv
 ) extends PublicData
-    with TheHiveOpsNoDeps {
+    with TheHiveOps {
   lazy val logger: Logger         = Logger(getClass)
   override val entityName: String = "caseTemplate"
   override val initialQuery: Query =
@@ -128,15 +128,15 @@ class PublicCaseTemplate(
     .property("summary", UMapping.string.optional)(_.field.updatable)
     .property("user", UMapping.string)(_.field.updatable)
     .property("customFields", UMapping.jsonNative)(_.subSelect {
-      case (FPathElem(_, FPathElem(name, _)), caseTemplateSteps) => caseTemplateSteps.customFieldJsonValue(customFieldSrv, EntityIdOrName(name))
+      case (FPathElem(_, FPathElem(name, _)), caseTemplateSteps) => caseTemplateSteps.customFieldJsonValue(EntityIdOrName(name))
       case (_, caseTemplateSteps)                                => caseTemplateSteps.customFields.nameJsonValue.fold.domainMap(JsObject(_))
     }
       .filter[JsValue] {
         case (FPathElem(_, FPathElem(name, _)), caseTemplateTraversal, _, predicate) =>
           predicate match {
-            case Right(predicate) => caseTemplateTraversal.customFieldFilter(customFieldSrv, EntityIdOrName(name), predicate)
-            case Left(true)       => caseTemplateTraversal.hasCustomField(customFieldSrv, EntityIdOrName(name))
-            case Left(false)      => caseTemplateTraversal.hasNotCustomField(customFieldSrv, EntityIdOrName(name))
+            case Right(predicate) => caseTemplateTraversal.customFieldFilter(EntityIdOrName(name), predicate)
+            case Left(true)       => caseTemplateTraversal.hasCustomField(EntityIdOrName(name))
+            case Left(false)      => caseTemplateTraversal.hasNotCustomField(EntityIdOrName(name))
           }
         case (_, caseTraversal, _, _) => caseTraversal.empty
       }

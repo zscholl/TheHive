@@ -25,11 +25,12 @@ class UserCtrl(
     caseSrv: CaseSrv,
     userSrv: UserSrv,
     authSrv: AuthSrv,
-    val organisationSrv: OrganisationSrv,
+    override val organisationSrv: OrganisationSrv,
+    override val customFieldSrv: CustomFieldSrv,
     profileSrv: ProfileSrv,
     auditSrv: AuditSrv,
     attachmentSrv: AttachmentSrv,
-    implicit val db: Database
+    db: Database
 ) extends QueryableCtrl
     with TheHiveOps {
 

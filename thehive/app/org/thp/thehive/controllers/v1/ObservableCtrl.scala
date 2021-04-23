@@ -32,7 +32,8 @@ class ObservableCtrl(
     observableTypeSrv: ObservableTypeSrv,
     caseSrv: CaseSrv,
     alertSrv: AlertSrv,
-    val organisationSrv: OrganisationSrv,
+    override val organisationSrv: OrganisationSrv,
+    override val customFieldSrv: CustomFieldSrv,
     attachmentSrv: AttachmentSrv,
     temporaryFileCreator: TemporaryFileCreator,
     configuration: Configuration

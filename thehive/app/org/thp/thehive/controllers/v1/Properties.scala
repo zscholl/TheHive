@@ -20,10 +20,10 @@ class Properties(
     dashboardSrv: DashboardSrv,
     caseTemplateSrv: CaseTemplateSrv,
     observableSrv: ObservableSrv,
-    customFieldSrv: CustomFieldSrv,
-    organisationSrv: OrganisationSrv,
+    val customFieldSrv: CustomFieldSrv,
+    val organisationSrv: OrganisationSrv,
     db: Database
-) extends TheHiveOpsNoDeps {
+) extends TheHiveOps {
 
   lazy val metaProperties: PublicProperties =
     PublicPropertyListBuilder
@@ -86,15 +86,15 @@ class Properties(
       .property("customFields", UMapping.jsonNative)(_.subSelect {
         case (FPathElem(_, FPathElem(idOrName, _)), alerts) =>
           alerts
-            .customFieldJsonValue(customFieldSrv, EntityIdOrName(idOrName))
+            .customFieldJsonValue(EntityIdOrName(idOrName))
         case (_, alerts) => alerts.customFields.nameJsonValue.fold.domainMap(JsObject(_))
       }
         .filter[JsValue] {
           case (FPathElem(_, FPathElem(name, _)), alerts, _, predicate) =>
             predicate match {
-              case Right(predicate) => alerts.customFieldFilter(customFieldSrv, EntityIdOrName(name), predicate)
-              case Left(true)       => alerts.hasCustomField(customFieldSrv, EntityIdOrName(name))
-              case Left(false)      => alerts.hasNotCustomField(customFieldSrv, EntityIdOrName(name))
+              case Right(predicate) => alerts.customFieldFilter(EntityIdOrName(name), predicate)
+              case Left(true)       => alerts.hasCustomField(EntityIdOrName(name))
+              case Left(false)      => alerts.hasNotCustomField(EntityIdOrName(name))
             }
           case (_, caseTraversal, _, _) => caseTraversal.empty
         }
@@ -186,16 +186,15 @@ class Properties(
       })
       .property("customFields", UMapping.jsonNative)(_.subSelect {
         case (FPathElem(_, FPathElem(idOrName, _)), caseSteps) =>
-          caseSteps
-            .customFieldJsonValue(customFieldSrv, EntityIdOrName(idOrName))
+          caseSteps.customFieldJsonValue(EntityIdOrName(idOrName))
         case (_, caseSteps) => caseSteps.customFields.nameJsonValue.fold.domainMap(JsObject(_))
       }
         .filter[JsValue] {
           case (FPathElem(_, FPathElem(name, _)), caseTraversal, _, predicate) =>
             predicate match {
-              case Right(predicate) => caseTraversal.customFieldFilter(customFieldSrv, EntityIdOrName(name), predicate)
-              case Left(true)       => caseTraversal.hasCustomField(customFieldSrv, EntityIdOrName(name))
-              case Left(false)      => caseTraversal.hasNotCustomField(customFieldSrv, EntityIdOrName(name))
+              case Right(predicate) => caseTraversal.customFieldFilter(EntityIdOrName(name), predicate)
+              case Left(true)       => caseTraversal.hasCustomField(EntityIdOrName(name))
+              case Left(false)      => caseTraversal.hasNotCustomField(EntityIdOrName(name))
             }
           case (_, caseTraversal, _, _) => caseTraversal.empty
         }
@@ -251,16 +250,15 @@ class Properties(
       .property("user", UMapping.string)(_.field.updatable)
       .property("customFields", UMapping.jsonNative)(_.subSelect {
         case (FPathElem(_, FPathElem(idOrName, _)), caseTemplateSteps) =>
-          caseTemplateSteps
-            .customFieldJsonValue(customFieldSrv, EntityIdOrName(idOrName))
+          caseTemplateSteps.customFieldJsonValue(EntityIdOrName(idOrName))
         case (_, caseTemplateSteps) => caseTemplateSteps.customFields.nameJsonValue.fold.domainMap(JsObject(_))
       }
         .filter[JsValue] {
           case (FPathElem(_, FPathElem(name, _)), caseTemplateTraversal, _, predicate) =>
             predicate match {
-              case Right(predicate) => caseTemplateTraversal.customFieldFilter(customFieldSrv, EntityIdOrName(name), predicate)
-              case Left(true)       => caseTemplateTraversal.hasCustomField(customFieldSrv, EntityIdOrName(name))
-              case Left(false)      => caseTemplateTraversal.hasNotCustomField(customFieldSrv, EntityIdOrName(name))
+              case Right(predicate) => caseTemplateTraversal.customFieldFilter(EntityIdOrName(name), predicate)
+              case Left(true)       => caseTemplateTraversal.hasCustomField(EntityIdOrName(name))
+              case Left(false)      => caseTemplateTraversal.hasNotCustomField(EntityIdOrName(name))
             }
           case (_, caseTraversal, _, _) => caseTraversal.empty
         }

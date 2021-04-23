@@ -41,7 +41,8 @@ class AlertCtrl(
     userSrv: UserSrv,
     caseSrv: CaseSrv,
     observableSrv: ObservableSrv,
-    val organisationSrv: OrganisationSrv,
+    override val customFieldSrv: CustomFieldSrv,
+    override val organisationSrv: OrganisationSrv,
     override val publicData: PublicAlert,
     implicit val db: Database,
     override val queryExecutor: QueryExecutor
@@ -338,7 +339,7 @@ class AlertCtrl(
 class PublicAlert(
     alertSrv: AlertSrv,
     val organisationSrv: OrganisationSrv,
-    customFieldSrv: CustomFieldSrv,
+    val customFieldSrv: CustomFieldSrv,
     db: Database
 ) extends PublicData
     with TheHiveOps {
@@ -464,15 +465,15 @@ class PublicAlert(
       .property("user", UMapping.string)(_.field.updatable)
       .property("customFields", UMapping.jsonNative)(_.subSelect {
         case (FPathElem(_, FPathElem(idOrName, _)), alerts) =>
-          alerts.customFieldJsonValue(customFieldSrv, EntityIdOrName(idOrName))
+          alerts.customFieldJsonValue(EntityIdOrName(idOrName))
         case (_, alerts) => alerts.customFields.nameJsonValue.fold.domainMap(JsObject(_))
       }
         .filter[JsValue] {
           case (FPathElem(_, FPathElem(name, _)), alerts, _, predicate) =>
             predicate match {
-              case Right(predicate) => alerts.customFieldFilter(customFieldSrv, EntityIdOrName(name), predicate)
-              case Left(true)       => alerts.hasCustomField(customFieldSrv, EntityIdOrName(name))
-              case Left(false)      => alerts.hasNotCustomField(customFieldSrv, EntityIdOrName(name))
+              case Right(predicate) => alerts.customFieldFilter(EntityIdOrName(name), predicate)
+              case Left(true)       => alerts.hasCustomField(EntityIdOrName(name))
+              case Left(false)      => alerts.hasNotCustomField(EntityIdOrName(name))
             }
           case (_, caseTraversal, _, _) => caseTraversal.empty
         }

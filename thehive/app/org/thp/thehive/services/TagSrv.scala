@@ -19,12 +19,13 @@ import scala.util.{Success, Try}
 
 class TagSrv(
     _organisationSrv: => OrganisationSrv,
+    override val customFieldSrv: CustomFieldSrv,
     taxonomySrv: TaxonomySrv,
     appConfig: ApplicationConfig,
     integrityCheckActor: => ActorRef @@ IntegrityCheckTag
 ) extends VertexSrv[Tag]
     with TheHiveOps {
-  lazy val organisationSrv: OrganisationSrv = _organisationSrv
+  override lazy val organisationSrv: OrganisationSrv = _organisationSrv
 
   val taxonomyTagSrv = new EdgeSrv[TaxonomyTag, Taxonomy, Tag]
   private val freeTagColourConfig: ConfigItem[String, String] =

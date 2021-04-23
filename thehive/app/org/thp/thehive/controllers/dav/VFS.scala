@@ -4,7 +4,7 @@ import org.thp.scalligraph.auth.AuthContext
 import org.thp.scalligraph.traversal.Graph
 import org.thp.thehive.services._
 
-class VFS(caseSrv: CaseSrv, val organisationSrv: OrganisationSrv) extends TheHiveOps {
+class VFS(caseSrv: CaseSrv, val organisationSrv: OrganisationSrv, val customFieldSrv: CustomFieldSrv) extends TheHiveOps {
 
   def get(path: List[String])(implicit graph: Graph, authContext: AuthContext): Seq[Resource] =
     path match {

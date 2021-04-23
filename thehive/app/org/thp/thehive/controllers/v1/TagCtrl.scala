@@ -11,7 +11,7 @@ import org.thp.scalligraph.traversal.{Converter, IteratorOutput, Traversal}
 import org.thp.scalligraph.utils.FunctionalCondition.When
 import org.thp.thehive.controllers.v1.Conversion._
 import org.thp.thehive.models.{Permissions, Tag}
-import org.thp.thehive.services.{OrganisationSrv, TagSrv, TheHiveOps}
+import org.thp.thehive.services.{CustomFieldSrv, OrganisationSrv, TagSrv, TheHiveOps}
 import play.api.mvc.{Action, AnyContent, Results}
 
 case class TagHint(freeTag: Option[String], namespace: Option[String], predicate: Option[String], value: Option[String], limit: Option[Long])
@@ -20,7 +20,8 @@ class TagCtrl(
     entrypoint: Entrypoint,
     db: Database,
     tagSrv: TagSrv,
-    val organisationSrv: OrganisationSrv,
+    override val organisationSrv: OrganisationSrv,
+    override val customFieldSrv: CustomFieldSrv,
     properties: Properties,
     appConfig: ApplicationConfig
 ) extends QueryableCtrl

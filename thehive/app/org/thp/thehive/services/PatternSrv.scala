@@ -14,7 +14,8 @@ import scala.util.{Success, Try}
 class PatternSrv(
     auditSrv: AuditSrv,
     caseSrv: CaseSrv,
-    val organisationSrv: OrganisationSrv
+    override val organisationSrv: OrganisationSrv,
+    override val customFieldSrv: CustomFieldSrv
 ) extends VertexSrv[Pattern]
     with TheHiveOps {
   val patternPatternSrv = new EdgeSrv[PatternPattern, Pattern, Pattern]
