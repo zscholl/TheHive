@@ -1,12 +1,19 @@
 package org.thp.thehive.dto.v0
 
+import eu.timepit.refined.api.Refined
+import eu.timepit.refined.W
+import eu.timepit.refined.collection.MaxSize
 import org.thp.scalligraph.controllers.WithParser
 import play.api.libs.json._
 
 import java.util.Date
+import be.venneborg.refined.play.RefinedJsonFormats._
+import org.thp.scalligraph.`macro`.{LogGeneratedCode, TraceLogLevel}
 
+@TraceLogLevel
+@LogGeneratedCode
 case class InputCase(
-    title: String,
+    title: String Refined MaxSize[W.`10`.T],
     description: String,
     severity: Option[Int] = None,
     startDate: Option[Date] = None,

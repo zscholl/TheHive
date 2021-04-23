@@ -1,5 +1,8 @@
 package org.thp.thehive.controllers.v0
 
+import eu.timepit.refined.api.Refined
+import eu.timepit.refined.{refineT, refineV}
+import io.scalaland.chimney.Transformer
 import io.scalaland.chimney.dsl._
 import org.thp.scalligraph.EntityId
 import org.thp.scalligraph.auth.{AuthContext, Permission, PermissionDesc}
@@ -12,6 +15,8 @@ import play.api.libs.json.{JsObject, JsValue, Json, Writes}
 import java.util.Date
 
 object Conversion {
+  implicit def refinedTransformer[T, P]: Transformer[Refined[T, P], T] = _.value
+
   implicit class RendererOps[F, O](f: F)(implicit renderer: Renderer.Aux[F, O]) {
     def toJson: JsValue = renderer.toOutput(f).toJson
     def toValue: O      = renderer.toOutput(f).toValue
@@ -179,7 +184,7 @@ object Conversion {
 
     def withCaseTemplate(caseTemplate: RichCaseTemplate): InputCase =
       InputCase(
-        title = caseTemplate.titlePrefix.getOrElse("") + inputCase.title,
+        title = refineV.unsafeFrom(caseTemplate.titlePrefix.getOrElse("") + inputCase.title.value),
         description = inputCase.description,
         severity = inputCase.severity orElse caseTemplate.severity,
         startDate = inputCase.startDate,
