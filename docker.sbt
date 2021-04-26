@@ -1,7 +1,7 @@
 import Common.{betaVersion, snapshotVersion, stableVersion, versionUsage}
 import com.typesafe.sbt.packager.docker.{Cmd, ExecCmd}
 
-version in Docker := {
+Docker / version := {
   version.value match {
     case stableVersion(_, _)                      => version.value
     case betaVersion(v1, v2, v3)                  => v1 + "-0." + v3 + "RC" + v2
@@ -10,17 +10,17 @@ version in Docker := {
     case _                                        => versionUsage(version.value)
   }
 }
-defaultLinuxInstallLocation in Docker := "/opt/thehive"
+Docker / defaultLinuxInstallLocation := "/opt/thehive"
 dockerRepository := Some("thehiveproject")
 dockerUpdateLatest := !version.value.toUpperCase.contains("RC") && !version.value.contains("SNAPSHOT")
 dockerExposedPorts := Seq(9000)
-mappings in Docker ++= Seq(
+Docker / mappings ++= Seq(
   file("package/docker/entrypoint")     -> "/opt/thehive/entrypoint",
   file("package/logback.xml")           -> "/etc/thehive/logback.xml",
   file("package/logback-migration.xml") -> "/etc/thehive/logback-migration.xml",
   file("package/empty")                 -> "/var/log/thehive/application.log"
 )
-mappings in Docker ~= (_.filterNot {
+Docker / mappings ~= (_.filterNot {
   case (_, filepath) => filepath == "/opt/thehive/conf/application.conf"
 })
 dockerCommands := Seq(

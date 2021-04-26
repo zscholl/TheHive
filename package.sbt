@@ -1,7 +1,7 @@
 import Common.remapPath
 // Remove conf files
 // Install service files
-mappings in Universal ~= {
+Universal / mappings ~= {
   _.flatMap {
     case (_, "conf/application.conf")           => Nil
     case (file, "conf/application.sample.conf") => Seq(file -> "conf/application.conf")

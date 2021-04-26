@@ -1,6 +1,6 @@
 import Common.{betaVersion, snapshotVersion, stableVersion, versionUsage}
 
-version in Rpm := {
+Rpm / version := {
   version.value match {
     case stableVersion(v1, _)                   => v1
     case betaVersion(v1, _, _)                  => v1
@@ -23,19 +23,19 @@ rpmUrl := organizationHomepage.value.map(_.toString)
 rpmLicense := Some("AGPL")
 rpmRequirements += "java-1.8.0-openjdk-headless"
 
-maintainerScripts in Rpm := maintainerScriptsFromDirectory(
+Rpm / maintainerScripts := maintainerScriptsFromDirectory(
   baseDirectory.value / "package" / "rpm",
   Seq(RpmConstants.Pre, RpmConstants.Post, RpmConstants.Preun, RpmConstants.Postun)
 )
 
-linuxPackageSymlinks in Rpm := Nil
+Rpm / linuxPackageSymlinks := Nil
 rpmPrefix := Some(defaultLinuxInstallLocation.value)
 
-linuxPackageMappings in Rpm := configWithNoReplace((linuxPackageMappings in Rpm).value)
+Rpm / linuxPackageMappings := configWithNoReplace((Rpm / linuxPackageMappings).value)
 
-packageBin in Rpm := {
+Rpm / packageBin := {
   import scala.sys.process._
-  val rpmFile = (packageBin in Rpm).value
+  val rpmFile = (Rpm / packageBin).value
   Process(
     "rpm" ::
       "--define" :: "_gpg_name TheHive Project" ::

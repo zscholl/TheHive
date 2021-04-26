@@ -1,8 +1,8 @@
 import Common.{betaVersion, snapshotVersion, stableVersion, versionUsage}
 
-linuxPackageMappings in Debian += packageMapping(file("LICENSE") -> "/usr/share/doc/thehive/copyright").withPerms("644")
-name in Debian := "thehive4"
-version in Debian := {
+Debian / linuxPackageMappings += packageMapping(file("LICENSE") -> "/usr/share/doc/thehive/copyright").withPerms("644")
+Debian / name := "thehive4"
+Debian / version := {
   version.value match {
     case stableVersion(_, _)                      => version.value
     case betaVersion(v1, v2, v3)                  => v1 + "-0." + v3 + "RC" + v2
@@ -13,8 +13,8 @@ version in Debian := {
 }
 debianPackageConflicts += "thehive"
 debianPackageDependencies += "java8-runtime-headless"
-maintainerScripts in Debian := maintainerScriptsFromDirectory(
+Debian / maintainerScripts := maintainerScriptsFromDirectory(
   baseDirectory.value / "package" / "debian",
   Seq(DebianConstants.Postinst, DebianConstants.Prerm, DebianConstants.Postrm)
 )
-linuxMakeStartScript in Debian := None
+Debian / linuxMakeStartScript := None
