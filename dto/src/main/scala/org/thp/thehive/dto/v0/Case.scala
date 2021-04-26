@@ -10,10 +10,8 @@ import java.util.Date
 import be.venneborg.refined.play.RefinedJsonFormats._
 import org.thp.scalligraph.`macro`.{LogGeneratedCode, TraceLogLevel}
 
-@TraceLogLevel
-@LogGeneratedCode
 case class InputCase(
-    title: String Refined MaxSize[W.`10`.T],
+    title: String Refined MaxSize[W.`100`.T],
     description: String,
     severity: Option[Int] = None,
     startDate: Option[Date] = None,
