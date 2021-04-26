@@ -73,7 +73,7 @@ lazy val scalligraph = (project in file("ScalliGraph"))
 
 lazy val thehive = (project in file("."))
   .enablePlugins(PlayScala)
-  .dependsOn(thehiveCore, thehiveCortex, thehiveMisp, thehiveFrontend, thehiveMigration)
+  .dependsOn(thehiveBackend, thehiveFrontend, thehiveMigration)
   .settings(
     name := "thehive",
     version := thehiveVersion,
@@ -136,6 +136,8 @@ lazy val thehive = (project in file("."))
       (cortexDto / Test / testQuick).evaluated
     }
   )
+
+lazy val thehiveBackend = project.dependsOn(thehiveCore, thehiveCortex, thehiveMisp)
 
 lazy val thehiveCore = (project in file("thehive"))
   .enablePlugins(PlayScala)
