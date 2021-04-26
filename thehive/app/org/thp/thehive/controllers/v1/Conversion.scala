@@ -346,6 +346,7 @@ object Conversion {
         .into[User]
         .withFieldComputed(_.id, _.login)
         .withFieldConst(_.apikey, None)
+        .withFieldConst(_.resetSecret, None)
         .withFieldConst(_.password, None)
         .withFieldConst(_.locked, false)
         .withFieldConst(_.totpSecret, None)

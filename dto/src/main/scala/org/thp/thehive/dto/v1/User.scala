@@ -5,7 +5,15 @@ import play.api.libs.json.{Json, OFormat, Writes}
 
 import java.util.Date
 
-case class InputUser(login: String, name: String, password: Option[String], profile: String, organisation: Option[String], avatar: Option[FFile])
+case class InputUser(
+    login: String,
+    name: String,
+    email: Option[String],
+    password: Option[String],
+    profile: String,
+    organisation: Option[String],
+    avatar: Option[FFile]
+)
 
 object InputUser {
   implicit val writes: Writes[InputUser] = Json.writes[InputUser]
@@ -24,6 +32,7 @@ case class OutputUser(
     _updatedAt: Option[Date],
     login: String,
     name: String,
+    email: Option[String],
     hasKey: Boolean,
     hasPassword: Boolean,
     hasMFA: Boolean,
