@@ -8,7 +8,6 @@ import play.api.libs.json._
 
 import java.util.Date
 import be.venneborg.refined.play.RefinedJsonFormats._
-import org.thp.scalligraph.`macro`.{LogGeneratedCode, TraceLogLevel}
 
 case class InputCase(
     title: String Refined MaxSize[W.`100`.T],

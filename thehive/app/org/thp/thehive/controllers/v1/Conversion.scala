@@ -1,8 +1,7 @@
 package org.thp.thehive.controllers.v1
 
 import eu.timepit.refined.api.Refined
-import eu.timepit.refined.collection.MaxSize
-import eu.timepit.refined.{refineMV, refineT, refineV, W}
+import eu.timepit.refined.refineV
 import io.scalaland.chimney.Transformer
 import io.scalaland.chimney.dsl._
 import org.thp.scalligraph.EntityId
