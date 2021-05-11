@@ -1,6 +1,5 @@
 package org.thp.thehive.dto.v0
 
-import eu.timepit.refined.W
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.collection.MaxSize
 import org.thp.scalligraph.controllers.WithParser
@@ -10,7 +9,7 @@ import be.venneborg.refined.play.RefinedJsonFormats._
 import java.util.Date
 
 case class InputAlert(
-    `type`: String Refined MaxSize[W.`16`.T],
+    `type`: String Refined MaxSize[16],
     source: String,
     sourceRef: String,
     externalLink: Option[String],
