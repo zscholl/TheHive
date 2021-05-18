@@ -6,6 +6,7 @@ import org.thp.scalligraph.models.{Database, Entity, UMapping}
 import org.thp.scalligraph.query.{ParamQuery, PublicProperties, PublicPropertyListBuilder, Query}
 import org.thp.scalligraph.traversal.{IteratorOutput, Traversal}
 import org.thp.thehive.controllers.v1.Conversion._
+import org.thp.thehive.dto.v1.InputCustomField
 import org.thp.thehive.models._
 import org.thp.thehive.services.{CustomFieldSrv, TheHiveOpsNoDeps}
 import play.api.mvc.{Action, AnyContent, Results}
@@ -39,11 +40,11 @@ class CustomFieldCtrl(entrypoint: Entrypoint, db: Database, customFieldSrv: Cust
 
   def create: Action[AnyContent] =
     entrypoint("create custom field")
-      .extract("customField", FieldsParser[CustomField])
+      .extract("customField", FieldsParser[InputCustomField])
       .authTransaction(db) { implicit request => implicit graph =>
         val customField = request.body("customField")
         customFieldSrv
-          .create(customField)
+          .create(customField.toCustomField)
           .map(createdCustomField => Results.Created(createdCustomField.toJson))
       }
 

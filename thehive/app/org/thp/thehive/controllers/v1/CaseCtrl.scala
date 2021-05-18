@@ -11,7 +11,10 @@ import org.thp.thehive.controllers.v1.Conversion._
 import org.thp.thehive.dto.v1.{InputCase, InputTask}
 import org.thp.thehive.models._
 import org.thp.thehive.services._
+import play.api.libs.json.{JsArray, JsNumber, JsObject}
 import play.api.mvc.{Action, AnyContent, Results}
+
+import scala.util.Success
 
 class CaseCtrl(
     entrypoint: Entrypoint,
@@ -169,5 +172,22 @@ class CaseCtrl(
               )
           mergedCase <- caseSrv.merge(cases)
         } yield Results.Created(mergedCase.toJson)
+      }
+
+  def linkedCases(caseIdOrNumber: String): Action[AnyContent] =
+    entrypoint("case link")
+      .authRoTransaction(db) { implicit request => implicit graph =>
+        val relatedCases = caseSrv
+          .get(EntityIdOrName(caseIdOrNumber))
+          .visible
+          .linkedCases
+          .map {
+            case (c, o) =>
+              c.toJson.as[JsObject] +
+                ("linkedWith" -> o.toJson) +
+                ("linksCount" -> JsNumber(o.size))
+          }
+
+        Success(Results.Ok(JsArray(relatedCases)))
       }
 }
