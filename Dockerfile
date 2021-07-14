@@ -6,7 +6,7 @@ FROM openjdk:8 as build-env
 
 LABEL MAINTAINER="TheHive Project <support@thehive-project.org>"
 
-ARG THEHIVE_VERSION=develop
+COPY . .
 
 RUN apt update && \
   apt install -y apt-transport-https && \
@@ -17,16 +17,10 @@ RUN apt update && \
   apt-get install -y git && \
   npm install -g grunt-cli \
                  bower && \
-  git -c advice.detachedHead=false \
-      clone \
-      --branch=$THEHIVE_VERSION \
-      --depth=1 \
-      https://github.com/TheHive-Project/TheHive.git && \
   echo '{"allow_root": true}' > /root/.bowerrc && \
-  cd TheHive && \
   ./sbt clean stage && \
-  mv /TheHive/target/universal/stage /opt/thehive && \
-  mv /TheHive/package/docker/entrypoint /opt/thehive/entrypoint && \
+  mv target/universal/stage /opt/thehive && \
+  mv package/docker/entrypoint /opt/thehive/entrypoint && \
   mkdir /var/log/thehive && \
   apt-get purge -y git && \
   rm -rf /TheHive \
